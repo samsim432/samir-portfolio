@@ -17,8 +17,6 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "../firebase";
 
 const categories = [
   "AI",
@@ -39,7 +37,6 @@ function Admin() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
   const [publishedArticles, setPublishedArticles] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
   const [isPublishing, setIsPublishing] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -128,21 +125,6 @@ function Admin() {
     }));
   }
 
-  function handleImageChange(e) {
-    const file = e.target.files[0];
-
-    if (!file) return;
-
-    setImageFile(file);
-
-    const imagePreviewUrl = URL.createObjectURL(file);
-
-    setFormData((prev) => ({
-      ...prev,
-      image: imagePreviewUrl,
-    }));
-  }
-
   function resetForm() {
     setFormData({
       title: "",
@@ -153,7 +135,6 @@ function Admin() {
       image: "",
     });
 
-    setImageFile(null);
     setEditingId(null);
   }
 
@@ -165,11 +146,11 @@ function Admin() {
       category: article.category,
       author: article.author,
       shortDescription: article.text,
-      fullDetails: article.content.join("\n"),
+      fullDetails: Array.isArray(article.content)
+        ? article.content.join("\n")
+        : "",
       image: article.image,
     });
-
-    setImageFile(null);
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -193,26 +174,13 @@ function Admin() {
     e.preventDefault();
 
     if (!formData.image) {
-      alert("Please choose an article image.");
+      alert("Please paste an article image URL.");
       return;
     }
 
     setIsPublishing(true);
 
     try {
-      let imageUrl = formData.image;
-
-      if (imageFile) {
-        const imageRef = ref(
-          storage,
-          `article-images/${Date.now()}-${imageFile.name}`
-        );
-
-        await uploadBytes(imageRef, imageFile);
-
-        imageUrl = await getDownloadURL(imageRef);
-      }
-
       const newArticle = {
         title: formData.title,
         category: formData.category,
@@ -222,7 +190,7 @@ function Admin() {
         content: formData.fullDetails
           .split("\n")
           .filter((paragraph) => paragraph.trim() !== ""),
-        image: imageUrl,
+        image: formData.image,
         publishedAt: serverTimestamp(),
         updatedAt: null,
       };
@@ -249,8 +217,6 @@ function Admin() {
         fullDetails: "",
         image: "",
       });
-
-      setImageFile(null);
 
       alert(
         editingId
@@ -423,12 +389,14 @@ function Admin() {
               style={inputStyle}
             />
 
-            <label style={labelStyle}>Article Photo</label>
+            <label style={labelStyle}>Article Image URL</label>
             <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              required={!formData.image}
+              type="text"
+              name="image"
+              placeholder="Paste image URL here"
+              value={formData.image}
+              onChange={handleChange}
+              required
               style={inputStyle}
             />
 
@@ -474,7 +442,8 @@ function Admin() {
                 color: "#ffffff",
                 fontSize: "16px",
                 fontWeight: "900",
-                cursor: "pointer",
+                cursor: isPublishing ? "not-allowed" : "pointer",
+                opacity: isPublishing ? 0.7 : 1,
               }}
             >
               {isPublishing
@@ -544,8 +513,8 @@ function Admin() {
 
                       <span style={dateStyle}>
                         {article.updatedAt
-                          ? `Updated: ${article.updatedAt}`
-                          : `Published: ${article.publishedAt}`}
+                          ? "Updated"
+                          : "Published"}
                       </span>
                     </div>
 
