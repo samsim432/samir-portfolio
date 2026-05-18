@@ -19,7 +19,6 @@ function Navbar() {
 
       links.forEach(([id]) => {
         const section = document.getElementById(id);
-
         if (!section) return;
 
         const top = section.offsetTop - 130;
@@ -32,7 +31,6 @@ function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
-
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
@@ -41,8 +39,7 @@ function Navbar() {
   return (
     <header className={`navbar-wrap ${scrolled ? "scrolled" : ""}`}>
       <nav className="navbar">
-
-        {/* LOGO + PROFILE */}
+        {/* LOGO */}
         <a href="/" className="logo" onClick={() => setOpen(false)}>
           <span className="logo-full">
             <strong>Samir</strong> Simkhada
@@ -55,7 +52,7 @@ function Navbar() {
           />
         </a>
 
-        {/* MOBILE MENU BUTTON */}
+        {/* MOBILE BUTTON */}
         <button
           className={`menu-btn ${open ? "open" : ""}`}
           onClick={() => setOpen(!open)}
@@ -66,7 +63,7 @@ function Navbar() {
           <span></span>
         </button>
 
-        {/* NAVIGATION */}
+        {/* NAV MENU */}
         <div className={`nav-menu ${open ? "show" : ""}`}>
           {links.map(([id, label]) => (
             <a
@@ -79,7 +76,6 @@ function Navbar() {
             </a>
           ))}
         </div>
-
       </nav>
     </header>
   );

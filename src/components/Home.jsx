@@ -1,4 +1,5 @@
 import "./Home.css";
+import Button from "../ui/Button";
 
 function Home() {
   return (
@@ -41,14 +42,15 @@ function Home() {
             <span>Real World</span>
           </div>
 
+          {/* UPDATED BUTTONS */}
           <div className="home-buttons">
-            <a href="#whatif" className="home-btn primary">
+            <Button href="#whatif" variant="primary">
               Explore What If
-            </a>
+            </Button>
 
-            <a href="#articles" className="home-btn secondary">
+            <Button href="#articles" variant="secondary">
               Read Articles
-            </a>
+            </Button>
           </div>
 
           <div className="social-links">

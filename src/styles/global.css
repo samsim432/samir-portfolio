@@ -1,0 +1,32 @@
+:root {
+  --primary: #0284c7;
+  --bg: #f8fafc;
+  --text: #0f172a;
+  --border: rgba(2, 132, 199, 0.15);
+  --shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+body {
+  margin: 0;
+  font-family: system-ui;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* SAME WIDTH FOR ALL PAGES */
+.container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+/* BASIC BUTTON STYLE */
+button {
+  cursor: pointer;
+}
+
+/* IMAGES CLEAN */
+img {
+  max-width: 100%;
+  display: block;
+}
