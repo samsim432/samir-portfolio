@@ -52,6 +52,15 @@
   font-size: 16px;
   margin-bottom: 42px;
 }
+.all-article-click {
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font: inherit;
+}
 
 /* GRID */
 .all-articles-grid {
@@ -71,6 +80,9 @@
   transition: all 0.3s ease;
   transform: translateY(0);
   position: relative;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .all-article-card:hover {
@@ -81,7 +93,7 @@
 /* IMAGE WRAPPER */
 .all-article-card img {
   width: 100%;
-  height: 190px;
+  height: 48%;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
@@ -90,7 +102,7 @@
   transform: scale(1.06);
 }
 
-/* TAG (FIXED PROPER POSITIONING) */
+/* TAG */
 .all-article-card span {
   position: absolute;
   top: 12px;
@@ -218,6 +230,54 @@
   color: #0f172a;
 }
 
+.all-suggestion-section {
+  margin-top: 34px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(14, 165, 233, 0.18);
+}
+
+.all-suggestion-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.all-suggestion-card {
+  margin-top: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border-radius: 18px !important;
+  text-align: left;
+}
+
+.all-suggestion-card img {
+  width: 100%;
+  height: 95px;
+  object-fit: cover;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.all-suggestion-card div {
+  padding: 12px;
+}
+
+.all-suggestion-card span {
+  position: static;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  color: #0284c7;
+  font-size: 11px;
+}
+
+.all-suggestion-card h4 {
+  margin-top: 6px;
+  color: #0f172a;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
 /* suggestion buttons */
 .all-article-popup-box button {
   margin-top: 10px;
@@ -249,12 +309,49 @@
   }
 
   .all-articles-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .all-article-card {
+    border-radius: 16px;
   }
 
   .all-article-card img {
-    height: 170px;
+    height: 45%;
+  }
+
+  .all-article-card h3 {
+    padding: 10px 10px 4px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  .all-article-card p {
+    padding: 0 10px 10px;
+    font-size: 10px;
+    line-height: 1.4;
+    margin-bottom: 0;
+  }
+
+  .all-article-card span {
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+
+  .all-suggestion-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .all-suggestion-card {
+    display: grid;
+    grid-template-columns: 92px 1fr;
+  }
+
+  .all-suggestion-card img {
+    height: 100%;
   }
 
   .all-article-popup-box {
