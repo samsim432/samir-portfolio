@@ -1,33 +1,37 @@
+import { Link } from "react-router-dom";
 import "./WhatIf.css";
 
 function WhatIf() {
   const videos = [
     {
-      image: "/reel-1.jpg",
+      image:
+        "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1200&auto=format&fit=crop",
       tag: "Space",
       title: "What If Earth Had Two Moons?",
-      text: "Explore how Earth’s tides, climate, and life would change forever.",
+      text: "Explore how Earth’s tides, climate, nights, and life could change if our planet had two moons.",
       link: "/reels",
     },
     {
-      image: "/reel-2.jpg",
-      tag: "Future",
+image:
+  "https://images.unsplash.com/photo-1614726365930-627c75da663e?q=80&w=1200&auto=format&fit=crop",tag: "Future",
       title: "What If Humans Lived on Mars?",
-      text: "A look at the challenges and possibilities of living on the red planet.",
+      text: "Discover the challenges of food, oxygen, shelter, gravity, and survival on the red planet.",
       link: "/reels",
     },
     {
-      image: "/reel-3.jpg",
+      image:
+        "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?q=80&w=1200&auto=format&fit=crop",
       tag: "History",
       title: "What If Dinosaurs Never Went Extinct?",
-      text: "How the world might look today if dinosaurs were still around.",
+      text: "Imagine how Earth, humans, and modern life might be different if dinosaurs still existed today.",
       link: "/reels",
     },
     {
-      image: "/reel-4.jpg",
+      image:
+        "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1200&auto=format&fit=crop",
       tag: "Technology",
       title: "What If AI Became More Intelligent?",
-      text: "Exploring the future of artificial intelligence and humanity.",
+      text: "A creative look at artificial intelligence, future technology, and humanity’s next big questions.",
       link: "/reels",
     },
   ];
@@ -41,9 +45,9 @@ function WhatIf() {
             <h2>What If Series</h2>
           </div>
 
-          <a href="/reels" className="view-all-btn">
+          <Link to="/reels" className="view-all-btn">
             View All
-          </a>
+          </Link>
         </div>
 
         <p className="section-intro">
@@ -55,17 +59,24 @@ function WhatIf() {
           {videos.map((item, index) => (
             <article className="card" key={index}>
               <div className="card-image">
-                <img src={item.image} alt={item.title} />
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+
                 <span>{item.tag}</span>
               </div>
 
               <div className="card-body">
                 <h3>{item.title}</h3>
+
                 <p>{item.text}</p>
 
-                <a href={item.link} className="read-more">
+                <Link to={item.link} className="read-more">
                   Watch Reel →
-                </a>
+                </Link>
               </div>
             </article>
           ))}

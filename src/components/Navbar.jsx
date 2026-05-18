@@ -6,12 +6,13 @@ function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("home");
 
-  const links = [
-    ["home", "Home"],
-    ["whatif", "What If"],
-    ["articles", "Articles"],
-    ["contact", "Contact"],
-  ];
+const links = [
+  ["home", "Home", "/#home"],
+  ["whatif", "What If", "/#whatif"],
+  ["articles", "Articles", "/articles"],
+  ["about", "About", "/about"],
+  ["contact", "Contact", "/#contact"],
+];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,16 +66,16 @@ function Navbar() {
 
         {/* NAV MENU */}
         <div className={`nav-menu ${open ? "show" : ""}`}>
-          {links.map(([id, label]) => (
-            <a
-              key={id}
-              href={`/#${id}`}
-              onClick={() => setOpen(false)}
-              className={active === id ? "active" : ""}
-            >
-              {label}
-            </a>
-          ))}
+{links.map(([id, label, href]) => (
+  <a
+    key={id}
+    href={href}
+    onClick={() => setOpen(false)}
+    className={active === id ? "active" : ""}
+  >
+    {label}
+  </a>
+))}
         </div>
       </nav>
     </header>

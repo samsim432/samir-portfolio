@@ -10,6 +10,8 @@ import Footer from "./components/Footer";
 import Reels from "./components/Reels";
 import ArticleDetail from "./components/ArticleDetail";
 import Admin from "./components/Admin";
+import About from "./components/About";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 
 import "./App.css";
 
@@ -78,6 +80,24 @@ function App() {
   element={
     <PageLayout>
       <Admin />
+    </PageLayout>
+  }
+/>
+
+<Route
+  path="/about"
+  element={
+    <PageLayout>
+      <About />
+    </PageLayout>
+  }
+/>
+
+<Route
+  path="/privacy-policy"
+  element={
+    <PageLayout>
+      <PrivacyPolicy />
     </PageLayout>
   }
 />

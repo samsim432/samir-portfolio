@@ -4,23 +4,31 @@ import "./Reels.css";
 function Reels() {
   const reels = [
     {
-      image: "/reel-1.jpg",
+      image:
+        "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?q=80&w=1200&auto=format&fit=crop",
       title: "What If Earth Had Two Moons?",
+      category: "Space",
       link: "https://www.instagram.com/simkhadasamir333/",
     },
     {
-      image: "/reel-2.jpg",
-      title: "What If Humans Lived on Mars?",
+image:
+  "https://images.unsplash.com/photo-1614726365930-627c75da663e?q=80&w=1200&auto=format&fit=crop",
+  title: "What If Humans Lived on Mars?",
+      category: "Future",
       link: "https://www.instagram.com/simkhadasamir333/",
     },
     {
-      image: "/reel-3.jpg",
+      image:
+        "https://images.unsplash.com/photo-1516534775068-ba3e7458af70?q=80&w=1200&auto=format&fit=crop",
       title: "What If Dinosaurs Never Went Extinct?",
+      category: "History",
       link: "https://www.instagram.com/simkhadasamir333/",
     },
     {
-      image: "/reel-4.jpg",
+      image:
+        "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=1200&auto=format&fit=crop",
       title: "What If AI Became More Intelligent?",
+      category: "Technology",
       link: "https://www.instagram.com/simkhadasamir333/",
     },
   ];
@@ -32,13 +40,16 @@ function Reels() {
           ← Back Home
         </Link>
 
-        <p className="reels-badge">Instagram Reels</p>
+        <div className="reels-hero">
+          <p className="reels-badge">Instagram Reels</p>
 
-        <h1>Watch Latest Reels</h1>
+          <h1>Watch Latest Reels</h1>
 
-        <p className="reels-intro">
-          Explore short What If videos, science stories, and creative reels.
-        </p>
+          <p className="reels-intro">
+            Explore short What If videos, science stories, future ideas, and
+            creative educational reels by Samir Simkhada.
+          </p>
+        </div>
 
         <div className="reels-grid">
           {reels.map((reel, index) => (
@@ -48,11 +59,20 @@ function Reels() {
               key={index}
               target="_blank"
               rel="noopener noreferrer"
+              aria-label={`Watch ${reel.title} on Instagram`}
             >
-              <img src={reel.image} alt={reel.title} />
+              <img
+                src={reel.image}
+                alt={reel.title}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+              />
 
               <div className="reel-overlay">
-                <span>▶</span>
+                <span className="play-icon">▶</span>
+
+                <small>{reel.category}</small>
+
                 <h3>{reel.title}</h3>
               </div>
             </a>
