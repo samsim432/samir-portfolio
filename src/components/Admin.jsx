@@ -251,20 +251,28 @@ function Admin() {
 
     setIsPublishing(true);
 
-    try {
-      const newArticle = {
-        title: formData.title,
-        category: formData.category,
-        tag: formData.category,
-        author: formData.author,
-        text: formData.shortDescription,
-        content: formData.fullDetails
-          .split("\n")
-          .filter((paragraph) => paragraph.trim() !== ""),
-        image: formData.image,
-        publishedAt: serverTimestamp(),
-        updatedAt: null,
-      };
+// inside handlePublishArticle
+
+try {
+  const slug = formData.title
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-");
+
+  const newArticle = {
+    slug,
+    title: formData.title,
+    category: formData.category,
+    tag: formData.category,
+    author: formData.author,
+    text: formData.shortDescription,
+    content: formData.fullDetails
+      .split("\n")
+      .filter((paragraph) => paragraph.trim() !== ""),
+    image: formData.image,
+    publishedAt: serverTimestamp(),
+    updatedAt: null,
+  };
 
       if (editingId) {
         const oldArticle = publishedArticles.find(

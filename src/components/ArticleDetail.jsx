@@ -1,11 +1,51 @@
-import { Link, useParams, Navigate } from "react-router-dom";
-import { articles } from "../data/articles";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useParams } from "react-router-dom";
+
+import {
+  collection,
+  onSnapshot,
+  query,
+} from "firebase/firestore";
+
+import { db } from "../firebase";
+
 import "./ArticleDetail.css";
 
 function ArticleDetail() {
   const { slug } = useParams();
 
-  const article = articles.find((item) => item.slug === slug);
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const articlesQuery = query(collection(db, "articles"));
+
+    const unsubscribe = onSnapshot(articlesQuery, (snapshot) => {
+      const firebaseArticles = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const foundArticle = firebaseArticles.find(
+        (item) => item.slug === slug
+      );
+
+      setArticle(foundArticle || null);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <section className="all-articles-page">
+        <div className="all-articles-container">
+          <p>Loading article...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (!article) {
     return <Navigate to="/articles" replace />;
@@ -21,20 +61,19 @@ function ArticleDetail() {
         <article className="article-detail-page">
           <img src={article.image} alt={article.title} />
 
-          <p className="articles-badge">{article.category}</p>
+          <p className="articles-badge">
+            {article.category}
+          </p>
 
           <h1>{article.title}</h1>
 
-          <p>
-            {article.date} • {article.readTime}
-          </p>
-
-          <p>{article.excerpt}</p>
+          <p>{article.text}</p>
 
           <div>
-            {article.content.map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+            {Array.isArray(article.content) &&
+              article.content.map((paragraph, index) => (
+                <p key={index}>{paragraph}</p>
+              ))}
           </div>
         </article>
       </div>
