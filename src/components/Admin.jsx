@@ -4,7 +4,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { auth } from "../firebase";
 import {
   addDoc,
   collection,
@@ -16,7 +15,9 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../firebase";
+
+import { auth, db } from "../firebase";
+import "./Admin.css";
 
 const categories = [
   "AI",
@@ -32,12 +33,18 @@ const categories = [
 function Admin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [user, setUser] = useState(null);
+
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
+
   const [publishedArticles, setPublishedArticles] = useState([]);
+  const [products, setProducts] = useState([]);
+
   const [isPublishing, setIsPublishing] = useState(false);
+  const [isPublishingProduct, setIsPublishingProduct] = useState(false);
 
   const [formData, setFormData] = useState({
     title: "",
@@ -46,6 +53,14 @@ function Admin() {
     shortDescription: "",
     fullDetails: "",
     image: "",
+  });
+
+  const [productForm, setProductForm] = useState({
+    title: "",
+    price: "",
+    description: "",
+    image: "",
+    buyLink: "",
   });
 
   useEffect(() => {
@@ -74,12 +89,34 @@ function Admin() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    const productsQuery = query(
+      collection(db, "products"),
+      orderBy("publishedAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(productsQuery, (snapshot) => {
+      const firebaseProducts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(firebaseProducts);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const filteredArticles = useMemo(() => {
     return publishedArticles.filter((article) => {
+      const title = article.title || "";
+      const text = article.text || "";
+      const author = article.author || "";
+
       const matchesSearch =
-        article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        article.author.toLowerCase().includes(searchTerm.toLowerCase());
+        title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        author.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesCategory =
         filterCategory === "All" || article.category === filterCategory;
@@ -89,6 +126,7 @@ function Admin() {
   }, [publishedArticles, searchTerm, filterCategory]);
 
   const totalArticles = publishedArticles.length;
+  const totalProducts = products.length;
   const totalCategories = new Set(publishedArticles.map((a) => a.category)).size;
   const latestArticle = publishedArticles[0];
 
@@ -113,10 +151,11 @@ function Admin() {
     setUser(null);
     setEmail("");
     setPassword("");
-    resetForm();
+    resetArticleForm();
+    resetProductForm();
   }
 
-  function handleChange(e) {
+  function handleArticleChange(e) {
     const { name, value } = e.target;
 
     setFormData((prev) => ({
@@ -125,7 +164,16 @@ function Admin() {
     }));
   }
 
-  function resetForm() {
+  function handleProductChange(e) {
+    const { name, value } = e.target;
+
+    setProductForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  }
+
+  function resetArticleForm() {
     setFormData({
       title: "",
       category: "AI",
@@ -138,18 +186,28 @@ function Admin() {
     setEditingId(null);
   }
 
+  function resetProductForm() {
+    setProductForm({
+      title: "",
+      price: "",
+      description: "",
+      image: "",
+      buyLink: "",
+    });
+  }
+
   function handleEditArticle(article) {
     setEditingId(article.id);
 
     setFormData({
-      title: article.title,
-      category: article.category,
-      author: article.author,
-      shortDescription: article.text,
+      title: article.title || "",
+      category: article.category || "AI",
+      author: article.author || "",
+      shortDescription: article.text || "",
       fullDetails: Array.isArray(article.content)
         ? article.content.join("\n")
         : "",
-      image: article.image,
+      image: article.image || "",
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -170,7 +228,20 @@ function Admin() {
     }
   }
 
-  async function handlePublish(e) {
+  async function handleDeleteProduct(id) {
+    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
+
+    if (!confirmDelete) return;
+
+    try {
+      await deleteDoc(doc(db, "products", id));
+      alert("Product deleted successfully.");
+    } catch (error) {
+      alert("Delete failed: " + error.message);
+    }
+  }
+
+  async function handlePublishArticle(e) {
     e.preventDefault();
 
     if (!formData.image) {
@@ -196,11 +267,13 @@ function Admin() {
       };
 
       if (editingId) {
+        const oldArticle = publishedArticles.find(
+          (article) => article.id === editingId
+        );
+
         await updateDoc(doc(db, "articles", editingId), {
           ...newArticle,
-          publishedAt: publishedArticles.find(
-            (article) => article.id === editingId
-          )?.publishedAt,
+          publishedAt: oldArticle?.publishedAt || serverTimestamp(),
           updatedAt: serverTimestamp(),
         });
 
@@ -209,14 +282,7 @@ function Admin() {
         await addDoc(collection(db, "articles"), newArticle);
       }
 
-      setFormData({
-        title: "",
-        category: "AI",
-        author: "",
-        shortDescription: "",
-        fullDetails: "",
-        image: "",
-      });
+      resetArticleForm();
 
       alert(
         editingId
@@ -230,17 +296,50 @@ function Admin() {
     }
   }
 
+  async function handlePublishProduct(e) {
+    e.preventDefault();
+
+    if (!productForm.image) {
+      alert("Please paste a product image URL.");
+      return;
+    }
+
+    if (!productForm.buyLink) {
+      alert("Please paste your PDF/buy/download link.");
+      return;
+    }
+
+    setIsPublishingProduct(true);
+
+    try {
+      await addDoc(collection(db, "products"), {
+        title: productForm.title,
+        price: productForm.price,
+        description: productForm.description,
+        image: productForm.image,
+        buyLink: productForm.buyLink,
+        publishedAt: serverTimestamp(),
+      });
+
+      resetProductForm();
+
+      alert("Product published successfully.");
+    } catch (error) {
+      alert("Product publish failed: " + error.message);
+    } finally {
+      setIsPublishingProduct(false);
+    }
+  }
+
   if (!user) {
     return (
-      <section style={loginPageStyle}>
-        <form onSubmit={handleLogin} style={loginCardStyle}>
-          <div style={loginIconStyle}>🔐</div>
+      <section className="admin-login-page">
+        <form onSubmit={handleLogin} className="admin-login-card">
+          <div className="admin-login-icon">🔐</div>
 
-          <h1 style={loginTitleStyle}>Admin Login</h1>
+          <h1>Admin Login</h1>
 
-          <p style={loginTextStyle}>
-            Enter your Firebase admin email and password.
-          </p>
+          <p>Enter your Firebase admin email and password.</p>
 
           <input
             type="email"
@@ -248,7 +347,6 @@ function Admin() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={inputStyle}
           />
 
           <input
@@ -257,117 +355,112 @@ function Admin() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={inputStyle}
           />
 
-          <button type="submit" style={primaryButtonStyle}>
-            Login
-          </button>
+          <button type="submit">Login</button>
         </form>
       </section>
     );
   }
 
   return (
-    <section style={pageStyle}>
-      <aside style={sidebarStyle}>
+    <section className="admin-page">
+      <aside className="admin-sidebar">
         <div>
-          <h2 style={brandStyle}>Admin</h2>
-          <p style={sidebarTextStyle}>Article Dashboard</p>
+          <h2>Admin</h2>
+          <p>Dashboard</p>
         </div>
 
-        <nav style={navStyle}>
-          <a href="#overview" style={navItemStyle}>
-            Overview
-          </a>
-          <a href="#editor" style={navItemStyle}>
-            Create Article
-          </a>
-          <a href="#manage" style={navItemStyle}>
-            Manage Articles
-          </a>
+        <nav>
+          <a href="#overview">Overview</a>
+          <a href="#editor">Create Article</a>
+          <a href="#manage">Manage Articles</a>
+          <a href="#products">Digital Products</a>
         </nav>
 
-        <button onClick={handleLogout} style={logoutButtonStyle}>
+        <button onClick={handleLogout} className="admin-sidebar-logout">
           Logout
         </button>
       </aside>
 
-      <main style={mainStyle}>
-        <header style={headerStyle}>
+      <main className="admin-main">
+        <header className="admin-header">
           <div>
-            <p style={eyebrowStyle}>Welcome back</p>
-            <h1 style={titleStyle}>Professional Admin Dashboard</h1>
-            <p style={subtitleStyle}>
-              Create, edit, delete, and manage your website articles.
+            <p className="admin-eyebrow">Welcome back</p>
+            <h1>Professional Admin Dashboard</h1>
+            <p className="admin-subtitle">
+              Create articles, manage products, and upload PDF product links.
             </p>
           </div>
 
-          <button onClick={handleLogout} style={topLogoutButtonStyle}>
-            Logout
-          </button>
+          <div className="admin-header-actions">
+            <button onClick={resetArticleForm} className="admin-light-btn">
+              Clear Article
+            </button>
 
-          <button onClick={resetForm} style={secondaryButtonStyle}>
-            Clear Form
-          </button>
+            <button onClick={resetProductForm} className="admin-light-btn">
+              Clear Product
+            </button>
+
+            <button onClick={handleLogout} className="admin-danger-btn">
+              Logout
+            </button>
+          </div>
         </header>
 
-        <section id="overview" style={statsGridStyle}>
-          <div style={statCardStyle}>
-            <p style={statLabelStyle}>Total Articles</p>
-            <h2 style={statNumberStyle}>{totalArticles}</h2>
+        <section id="overview" className="admin-stats-grid">
+          <div className="admin-stat-card">
+            <p>Total Articles</p>
+            <h2>{totalArticles}</h2>
           </div>
 
-          <div style={statCardStyle}>
-            <p style={statLabelStyle}>Categories Used</p>
-            <h2 style={statNumberStyle}>{totalCategories}</h2>
+          <div className="admin-stat-card">
+            <p>Total Products</p>
+            <h2>{totalProducts}</h2>
           </div>
 
-          <div style={statCardStyle}>
-            <p style={statLabelStyle}>Latest Article</p>
-            <h2 style={smallStatTextStyle}>
-              {latestArticle ? latestArticle.title : "No articles yet"}
-            </h2>
+          <div className="admin-stat-card">
+            <p>Categories Used</p>
+            <h2>{totalCategories}</h2>
+          </div>
+
+          <div className="admin-stat-card admin-wide-stat">
+            <p>Latest Article</p>
+            <h3>{latestArticle ? latestArticle.title : "No articles yet"}</h3>
           </div>
         </section>
 
-        <section id="editor" style={panelStyle}>
-          <div style={panelHeaderStyle}>
+        <section id="editor" className="admin-panel">
+          <div className="admin-panel-header">
             <div>
-              <h2 style={sectionTitleStyle}>
-                {editingId ? "Edit Article" : "Create New Article"}
-              </h2>
-              <p style={sectionTextStyle}>
-                Fill in the article details below.
-              </p>
+              <h2>{editingId ? "Edit Article" : "Create New Article"}</h2>
+              <p>Write and publish articles from desktop or mobile.</p>
             </div>
 
-            {editingId && <span style={editingBadgeStyle}>Editing Mode</span>}
+            {editingId && <span className="admin-editing-badge">Editing</span>}
           </div>
 
-          <form onSubmit={handlePublish}>
-            <div style={twoColumnStyle}>
+          <form onSubmit={handlePublishArticle} className="admin-form">
+            <div className="admin-two-column">
               <div>
-                <label style={labelStyle}>Article Title</label>
+                <label>Article Title</label>
                 <input
                   type="text"
                   name="title"
                   placeholder="Enter article title"
                   value={formData.title}
-                  onChange={handleChange}
+                  onChange={handleArticleChange}
                   required
-                  style={inputStyle}
                 />
               </div>
 
               <div>
-                <label style={labelStyle}>Category</label>
+                <label>Category</label>
                 <select
                   name="category"
                   value={formData.category}
-                  onChange={handleChange}
+                  onChange={handleArticleChange}
                   required
-                  style={inputStyle}
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -378,73 +471,58 @@ function Admin() {
               </div>
             </div>
 
-            <label style={labelStyle}>Written By</label>
+            <label>Written By</label>
             <input
               type="text"
               name="author"
               placeholder="Author name"
               value={formData.author}
-              onChange={handleChange}
+              onChange={handleArticleChange}
               required
-              style={inputStyle}
             />
 
-            <label style={labelStyle}>Article Image URL</label>
+            <label>Article Image URL</label>
             <input
               type="text"
               name="image"
               placeholder="Paste image URL here"
               value={formData.image}
-              onChange={handleChange}
+              onChange={handleArticleChange}
               required
-              style={inputStyle}
             />
 
             {formData.image && (
               <img
                 src={formData.image}
-                alt="Preview"
-                style={previewImageStyle}
+                alt="Article preview"
+                className="admin-preview-image"
               />
             )}
 
-            <label style={labelStyle}>Short Description</label>
+            <label>Short Description</label>
             <textarea
               name="shortDescription"
               placeholder="Short article summary"
               value={formData.shortDescription}
-              onChange={handleChange}
+              onChange={handleArticleChange}
               required
               rows="3"
-              style={textareaStyle}
             />
 
-            <label style={labelStyle}>Full Article Details</label>
+            <label>Full Article Details</label>
             <textarea
               name="fullDetails"
               placeholder="Write full article details. Use new lines for separate paragraphs."
               value={formData.fullDetails}
-              onChange={handleChange}
+              onChange={handleArticleChange}
               required
               rows="10"
-              style={textareaStyle}
             />
 
             <button
               type="submit"
               disabled={isPublishing}
-              style={{
-                width: "100%",
-                padding: "16px",
-                borderRadius: "14px",
-                border: "none",
-                background: "#0284c7",
-                color: "#ffffff",
-                fontSize: "16px",
-                fontWeight: "900",
-                cursor: isPublishing ? "not-allowed" : "pointer",
-                opacity: isPublishing ? 0.7 : 1,
-              }}
+              className="admin-primary-btn"
             >
               {isPublishing
                 ? "Publishing..."
@@ -455,29 +533,25 @@ function Admin() {
           </form>
         </section>
 
-        <section id="manage" style={panelStyle}>
-          <div style={panelHeaderStyle}>
+        <section id="manage" className="admin-panel">
+          <div className="admin-panel-header">
             <div>
-              <h2 style={sectionTitleStyle}>Manage Articles</h2>
-              <p style={sectionTextStyle}>
-                Search, edit, or delete published articles.
-              </p>
+              <h2>Manage Articles</h2>
+              <p>Search, edit, or delete published articles.</p>
             </div>
           </div>
 
-          <div style={toolbarStyle}>
+          <div className="admin-toolbar">
             <input
               type="text"
               placeholder="Search articles..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={inputStyle}
             />
 
             <select
               value={filterCategory}
               onChange={(e) => setFilterCategory(e.target.value)}
-              style={inputStyle}
             >
               <option value="All">All Categories</option>
               {categories.map((category) => (
@@ -489,52 +563,39 @@ function Admin() {
           </div>
 
           {filteredArticles.length === 0 ? (
-            <div style={emptyStateStyle}>
+            <div className="admin-empty-state">
               <h3>No articles found</h3>
               <p>Create a new article or change your search filters.</p>
             </div>
           ) : (
-            <div style={articleListStyle}>
+            <div className="admin-list">
               {filteredArticles.map((article) => (
-                <article key={article.id} style={articleCardStyle}>
+                <article key={article.id} className="admin-list-card">
                   {article.image && (
-                    <img
-                      src={article.image}
-                      alt={article.title}
-                      style={articleImageStyle}
-                    />
+                    <img src={article.image} alt={article.title} />
                   )}
 
-                  <div style={articleContentStyle}>
-                    <div style={articleTopStyle}>
-                      <span style={categoryBadgeStyle}>
-                        {article.category}
-                      </span>
-
-                      <span style={dateStyle}>
-                        {article.updatedAt
-                          ? "Updated"
-                          : "Published"}
-                      </span>
+                  <div className="admin-list-content">
+                    <div className="admin-list-top">
+                      <span>{article.category}</span>
+                      <small>{article.updatedAt ? "Updated" : "Published"}</small>
                     </div>
 
-                    <h3 style={articleTitleStyle}>{article.title}</h3>
+                    <h3>{article.title}</h3>
+                    <p>{article.text}</p>
+                    <strong>By {article.author}</strong>
 
-                    <p style={articleTextStyle}>{article.text}</p>
-
-                    <p style={authorStyle}>By {article.author}</p>
-
-                    <div style={buttonRowStyle}>
+                    <div className="admin-button-row">
                       <button
                         onClick={() => handleEditArticle(article)}
-                        style={editButtonStyle}
+                        className="admin-edit-btn"
                       >
                         Edit
                       </button>
 
                       <button
                         onClick={() => handleDeleteArticle(article.id)}
-                        style={deleteButtonStyle}
+                        className="admin-delete-btn"
                       >
                         Delete
                       </button>
@@ -545,400 +606,143 @@ function Admin() {
             </div>
           )}
         </section>
+
+        <section id="products" className="admin-panel">
+          <div className="admin-panel-header">
+            <div>
+              <h2>Digital Products</h2>
+              <p>
+                Add PDFs, guides, eBooks, and paid/downloadable product links.
+              </p>
+            </div>
+          </div>
+
+          <form onSubmit={handlePublishProduct} className="admin-form">
+            <label>Product Title</label>
+            <input
+              type="text"
+              name="title"
+              placeholder="Example: AI Guide PDF"
+              value={productForm.title}
+              onChange={handleProductChange}
+              required
+            />
+
+            <div className="admin-two-column">
+              <div>
+                <label>Price</label>
+                <input
+                  type="text"
+                  name="price"
+                  placeholder="£4.99 or Free"
+                  value={productForm.price}
+                  onChange={handleProductChange}
+                  required
+                />
+              </div>
+
+              <div>
+                <label>Product Image URL</label>
+                <input
+                  type="text"
+                  name="image"
+                  placeholder="Paste image URL"
+                  value={productForm.image}
+                  onChange={handleProductChange}
+                  required
+                />
+              </div>
+            </div>
+
+            <label>Product Description</label>
+            <textarea
+              name="description"
+              placeholder="Write short product description"
+              value={productForm.description}
+              onChange={handleProductChange}
+              required
+              rows="4"
+            />
+
+            <label>PDF / Buy / Download Link</label>
+            <input
+              type="text"
+              name="buyLink"
+              placeholder="Google Drive, Gumroad, Payhip, Ko-fi, Buy Me a Coffee link"
+              value={productForm.buyLink}
+              onChange={handleProductChange}
+              required
+            />
+
+            {productForm.image && (
+              <img
+                src={productForm.image}
+                alt="Product preview"
+                className="admin-preview-image"
+              />
+            )}
+
+            <button
+              type="submit"
+              disabled={isPublishingProduct}
+              className="admin-primary-btn"
+            >
+              {isPublishingProduct ? "Publishing..." : "Publish Product"}
+            </button>
+          </form>
+
+          <div className="admin-product-manage">
+            <h2>Manage Products</h2>
+
+            {products.length === 0 ? (
+              <div className="admin-empty-state">
+                <h3>No products yet</h3>
+                <p>Add your first PDF or digital product above.</p>
+              </div>
+            ) : (
+              <div className="admin-list">
+                {products.map((product) => (
+                  <article key={product.id} className="admin-list-card">
+                    {product.image && (
+                      <img src={product.image} alt={product.title} />
+                    )}
+
+                    <div className="admin-list-content">
+                      <div className="admin-list-top">
+                        <span>{product.price}</span>
+                        <small>Product</small>
+                      </div>
+
+                      <h3>{product.title}</h3>
+                      <p>{product.description}</p>
+
+                      <div className="admin-button-row">
+                        <a
+                          href={product.buyLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="admin-edit-btn"
+                        >
+                          Open Link
+                        </a>
+
+                        <button
+                          onClick={() => handleDeleteProduct(product.id)}
+                          className="admin-delete-btn"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
       </main>
     </section>
   );
 }
-
-const pageStyle = {
-  minHeight: "100vh",
-  display: "grid",
-  gridTemplateColumns: "260px 1fr",
-  background: "#f1f5f9",
-  fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-};
-
-const sidebarStyle = {
-  minHeight: "100vh",
-  padding: "28px",
-  background: "linear-gradient(180deg, #0f172a, #020617)",
-  color: "#ffffff",
-  position: "sticky",
-  top: 0,
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "space-between",
-};
-
-const brandStyle = {
-  fontSize: "30px",
-  fontWeight: "900",
-  marginBottom: "4px",
-};
-
-const sidebarTextStyle = {
-  color: "#94a3b8",
-  fontSize: "14px",
-};
-
-const navStyle = {
-  display: "grid",
-  gap: "12px",
-  marginTop: "40px",
-};
-
-const navItemStyle = {
-  color: "#e2e8f0",
-  textDecoration: "none",
-  padding: "12px 14px",
-  borderRadius: "14px",
-  background: "rgba(255,255,255,0.06)",
-  fontWeight: "700",
-  fontSize: "14px",
-};
-
-const logoutButtonStyle = {
-  padding: "13px 16px",
-  borderRadius: "14px",
-  border: "1px solid rgba(255,255,255,0.15)",
-  background: "rgba(239,68,68,0.16)",
-  color: "#fecaca",
-  fontWeight: "900",
-  cursor: "pointer",
-};
-
-const mainStyle = {
-  padding: "40px",
-};
-
-const headerStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "20px",
-  alignItems: "center",
-  marginBottom: "28px",
-};
-
-const eyebrowStyle = {
-  color: "#0284c7",
-  fontWeight: "900",
-  marginBottom: "6px",
-  textTransform: "uppercase",
-  fontSize: "12px",
-  letterSpacing: "1px",
-};
-
-const titleStyle = {
-  fontSize: "clamp(32px, 4vw, 54px)",
-  lineHeight: "1",
-  fontWeight: "950",
-  color: "#0f172a",
-  margin: 0,
-};
-
-const subtitleStyle = {
-  color: "#64748b",
-  fontSize: "16px",
-  marginTop: "12px",
-};
-
-const statsGridStyle = {
-  display: "grid",
-  gridTemplateColumns: "repeat(3, 1fr)",
-  gap: "18px",
-  marginBottom: "28px",
-};
-
-const statCardStyle = {
-  background: "#ffffff",
-  borderRadius: "24px",
-  padding: "24px",
-  boxShadow: "0 14px 40px rgba(15,23,42,0.06)",
-  border: "1px solid #e2e8f0",
-};
-
-const statLabelStyle = {
-  color: "#64748b",
-  fontWeight: "800",
-  fontSize: "13px",
-  marginBottom: "10px",
-};
-
-const statNumberStyle = {
-  color: "#0f172a",
-  fontSize: "38px",
-  fontWeight: "950",
-  margin: 0,
-};
-
-const smallStatTextStyle = {
-  color: "#0f172a",
-  fontSize: "20px",
-  fontWeight: "900",
-  lineHeight: "1.25",
-  margin: 0,
-};
-
-const panelStyle = {
-  background: "#ffffff",
-  borderRadius: "28px",
-  padding: "28px",
-  boxShadow: "0 14px 40px rgba(15,23,42,0.06)",
-  border: "1px solid #e2e8f0",
-  marginBottom: "28px",
-};
-
-const panelHeaderStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  gap: "20px",
-  marginBottom: "24px",
-};
-
-const sectionTitleStyle = {
-  color: "#0f172a",
-  fontSize: "28px",
-  fontWeight: "950",
-  margin: 0,
-};
-
-const sectionTextStyle = {
-  color: "#64748b",
-  marginTop: "6px",
-};
-
-const twoColumnStyle = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "18px",
-};
-
-const labelStyle = {
-  display: "block",
-  color: "#0f172a",
-  fontSize: "14px",
-  fontWeight: "900",
-  marginBottom: "8px",
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "14px 16px",
-  marginBottom: "20px",
-  borderRadius: "14px",
-  border: "1px solid #cbd5e1",
-  fontSize: "15px",
-  outline: "none",
-  background: "#ffffff",
-  boxSizing: "border-box",
-};
-
-const textareaStyle = {
-  ...inputStyle,
-  resize: "vertical",
-  fontFamily: "inherit",
-  lineHeight: "1.6",
-};
-
-const primaryButtonStyle = {
-  width: "100%",
-  padding: "16px",
-  borderRadius: "16px",
-  border: "none",
-  background: "linear-gradient(135deg, #0284c7, #2563eb)",
-  color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "950",
-  cursor: "pointer",
-  boxShadow: "0 12px 30px rgba(37,99,235,0.25)",
-};
-
-const secondaryButtonStyle = {
-  padding: "13px 18px",
-  borderRadius: "14px",
-  border: "1px solid #cbd5e1",
-  background: "#ffffff",
-  color: "#0f172a",
-  fontWeight: "900",
-  cursor: "pointer",
-};
-
-const topLogoutButtonStyle = {
-  padding: "13px 18px",
-  borderRadius: "14px",
-  border: "none",
-  background: "#ef4444",
-  color: "#ffffff",
-  fontWeight: "900",
-  cursor: "pointer",
-};
-
-const editingBadgeStyle = {
-  padding: "8px 12px",
-  borderRadius: "999px",
-  background: "#dbeafe",
-  color: "#1d4ed8",
-  fontSize: "12px",
-  fontWeight: "900",
-};
-
-const previewImageStyle = {
-  width: "100%",
-  maxHeight: "340px",
-  objectFit: "cover",
-  borderRadius: "20px",
-  marginBottom: "22px",
-};
-
-const toolbarStyle = {
-  display: "grid",
-  gridTemplateColumns: "1fr 220px",
-  gap: "16px",
-};
-
-const articleListStyle = {
-  display: "grid",
-  gap: "18px",
-};
-
-const articleCardStyle = {
-  display: "grid",
-  gridTemplateColumns: "210px 1fr",
-  gap: "18px",
-  padding: "16px",
-  borderRadius: "22px",
-  border: "1px solid #e2e8f0",
-  background: "#f8fafc",
-};
-
-const articleImageStyle = {
-  width: "100%",
-  height: "160px",
-  objectFit: "cover",
-  borderRadius: "16px",
-};
-
-const articleContentStyle = {
-  display: "flex",
-  flexDirection: "column",
-  justifyContent: "space-between",
-};
-
-const articleTopStyle = {
-  display: "flex",
-  justifyContent: "space-between",
-  gap: "12px",
-  alignItems: "center",
-};
-
-const categoryBadgeStyle = {
-  padding: "6px 10px",
-  borderRadius: "999px",
-  background: "#e0f2fe",
-  color: "#0284c7",
-  fontSize: "12px",
-  fontWeight: "900",
-};
-
-const dateStyle = {
-  color: "#64748b",
-  fontSize: "12px",
-  fontWeight: "700",
-};
-
-const articleTitleStyle = {
-  color: "#0f172a",
-  fontSize: "22px",
-  fontWeight: "950",
-  margin: "12px 0 8px",
-};
-
-const articleTextStyle = {
-  color: "#475569",
-  lineHeight: "1.6",
-  margin: 0,
-};
-
-const authorStyle = {
-  color: "#0284c7",
-  fontWeight: "900",
-  marginTop: "10px",
-};
-
-const buttonRowStyle = {
-  display: "flex",
-  gap: "10px",
-  marginTop: "14px",
-};
-
-const editButtonStyle = {
-  padding: "10px 16px",
-  borderRadius: "12px",
-  border: "none",
-  background: "#0284c7",
-  color: "#ffffff",
-  fontWeight: "900",
-  cursor: "pointer",
-};
-
-const deleteButtonStyle = {
-  padding: "10px 16px",
-  borderRadius: "12px",
-  border: "none",
-  background: "#ef4444",
-  color: "#ffffff",
-  fontWeight: "900",
-  cursor: "pointer",
-};
-
-const emptyStateStyle = {
-  textAlign: "center",
-  padding: "50px 20px",
-  borderRadius: "22px",
-  background: "#f8fafc",
-  color: "#64748b",
-};
-
-const loginPageStyle = {
-  minHeight: "100vh",
-  padding: "120px 20px",
-  background:
-    "radial-gradient(circle at top left, rgba(14,165,233,0.22), transparent 35%), linear-gradient(135deg, #f8fafc, #e0f2fe)",
-  fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
-};
-
-const loginCardStyle = {
-  maxWidth: "430px",
-  margin: "0 auto",
-  background: "#ffffff",
-  padding: "34px",
-  borderRadius: "28px",
-  boxShadow: "0 20px 60px rgba(15,23,42,0.12)",
-  border: "1px solid #e2e8f0",
-};
-
-const loginIconStyle = {
-  width: "54px",
-  height: "54px",
-  borderRadius: "18px",
-  display: "grid",
-  placeItems: "center",
-  background: "#e0f2fe",
-  fontSize: "26px",
-  marginBottom: "18px",
-};
-
-const loginTitleStyle = {
-  color: "#0f172a",
-  fontSize: "34px",
-  fontWeight: "950",
-  marginBottom: "8px",
-};
-
-const loginTextStyle = {
-  color: "#64748b",
-  marginBottom: "24px",
-};
 
 export default Admin;

@@ -13,24 +13,24 @@ function Home() {
 
       <div className="home-container">
         <div className="home-content">
-          <p className="home-badge">Personal Portfolio & What If Stories</p>
+          <p className="home-badge">Personal Portfolio & Knowledge Creator</p>
 
           <h1>
             Hi, I am <span>Samir Simkhada</span>
           </h1>
 
           <h2 className="typing-text">
-            What If Writer • Science Explainer • Knowledge Creator
+            Science Explainer • Content Creator • Web Learner
           </h2>
 
           <p className="home-text">
-            I create interesting “What If” stories, educational explanations,
-            and knowledge-based content about science, history, imagination,
+            I create educational explanations, knowledge-based content, and
+            creative digital projects about science, history, imagination,
             space, AI, technology, and real-world possibilities.
           </p>
 
           <p className="home-cta-text">
-            Start exploring impossible questions with real explanations.
+            Need a creative person for content, ideas, writing, or digital work?
           </p>
 
           <div className="topic-chips">
@@ -38,14 +38,13 @@ function Home() {
             <span>History</span>
             <span>Space</span>
             <span>Future</span>
-            <span>Imagination</span>
-            <span>Real World</span>
+            <span>AI</span>
+            <span>Technology</span>
           </div>
 
-          {/* UPDATED BUTTONS */}
           <div className="home-buttons">
-            <Button href="#whatif" variant="primary">
-              Explore What If
+            <Button href="/hire" variant="primary">
+              Hire Me
             </Button>
 
             <Button href="#articles" variant="secondary">
@@ -113,7 +112,7 @@ function Home() {
           <div className="stats-grid">
             <div className="stat-card">
               <strong>50+</strong>
-              <span>Stories</span>
+              <span>Content Ideas</span>
             </div>
 
             <div className="stat-card">
@@ -122,18 +121,18 @@ function Home() {
             </div>
 
             <div className="stat-card">
-              <strong>Educational</strong>
-              <span>Content</span>
+              <strong>Creative</strong>
+              <span>Writing • Content • Digital Work</span>
             </div>
           </div>
         </div>
       </div>
 
-      <a href="#whatif" className="scroll-down">
+      <a href="/hire" className="scroll-down">
         <span className="mouse">
           <span></span>
         </span>
-        Scroll to explore
+        Hire me for your project
       </a>
     </section>
   );

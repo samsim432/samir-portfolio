@@ -8,27 +8,37 @@ function About() {
     {
       id: "story",
       title: "Who I Am",
-      text: "Hi, I’m Samir Simkhada — a science storytelling creator, educational content maker, and curious learner. I create content that connects imagination with knowledge, helping people explore science, technology, history, space, AI, and real-world possibilities in a simple and interesting way.",
+      text: "Hi, I’m Samir Simkhada, a Computer Science student and aspiring full-stack developer from Nepal, currently based in the UK. I’m passionate about building modern, responsive, and user-friendly web applications using technologies like HTML, CSS, JavaScript, React, Node.js, and Python.",
+    },
+    {
+      id: "developer",
+      title: "What I Do",
+      text: "I enjoy turning ideas into real digital experiences. I create websites, personal portfolios, software projects, and clean user interfaces. I continuously improve my skills through hands-on projects, problem-solving, and learning new technologies.",
     },
     {
       id: "website",
       title: "Why I Created This Website",
-      text: "I created this website as a central place for my articles, What If stories, science explanations, and creative educational content. Social media is great for short videos, but this website allows me to explain ideas in more detail and give readers a better learning experience.",
-    },
-    {
-      id: "goals",
-      title: "My Goals",
-      text: "My goal is to build a trusted educational platform where curious people can learn through creative questions, clear explanations, and meaningful stories. I want to make learning feel exciting, not boring, and inspire people to think deeper about the world around them.",
+      text: "I created this website as a central place to showcase my developer journey, personal projects, articles, What If stories, science explanations, and creative educational content. Social media is great for short videos, but this website allows me to explain ideas in more detail and share my work professionally.",
     },
     {
       id: "content",
       title: "What I Write About",
-      text: "On this website, I write about science, space, artificial intelligence, future technology, history, mysteries, human possibilities, and imaginative What If scenarios. Every topic is created to be easy to understand, useful, and enjoyable for readers.",
+      text: "Alongside coding, I write creative What If stories and educational content about IT, artificial intelligence, robots, space, physics, science, future technology, and imagination. I like combining creativity with knowledge to make complex ideas simple and interesting.",
+    },
+    {
+      id: "goals",
+      title: "My Goals",
+      text: "My goal is to grow as a developer, build impactful software, and create clean, professional solutions that help people and businesses online. I want to keep improving my technical skills while also building creative content that inspires curiosity.",
     },
     {
       id: "mission",
       title: "My Mission",
-      text: "My mission is to make educational content more creative, accessible, and inspiring. I believe knowledge becomes powerful when it is explained clearly and shared with curiosity, imagination, and purpose.",
+      text: "My mission is to make technology and educational content more creative, accessible, and inspiring. I believe knowledge becomes powerful when it is explained clearly and shared with curiosity, imagination, and purpose.",
+    },
+    {
+      id: "interests",
+      title: "My Interests",
+      text: "Outside of coding, I enjoy gaming, reading, exploring new creative ideas, learning about technology and design, and thinking about future possibilities in science and artificial intelligence.",
     },
   ];
 
@@ -40,9 +50,8 @@ function About() {
         <h1>Samir Simkhada</h1>
 
         <p>
-          Science storytelling creator sharing educational articles, What If
-          stories, and creative explanations about science, technology, space,
-          history, AI, and imagination.
+          Computer Science student, aspiring full-stack developer, and creative
+          storyteller from Nepal, currently based in the UK.
         </p>
       </div>
 

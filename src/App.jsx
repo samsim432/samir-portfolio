@@ -2,8 +2,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
-import WhatIf from "./components/WhatIf";
 import Articles from "./components/Articles";
+import Shop from "./components/Shop";
 import AllArticles from "./components/AllArticles";
 import ContactMe from "./components/ContactMe";
 import Footer from "./components/Footer";
@@ -12,6 +12,8 @@ import ArticleDetail from "./components/ArticleDetail";
 import Admin from "./components/Admin";
 import About from "./components/About";
 import PrivacyPolicy from "./components/PrivacyPolicy";
+import Hire from "./components/Hire";
+import ShopPage from "./components/ShopPage";
 
 import "./App.css";
 
@@ -29,8 +31,8 @@ function MainPage() {
   return (
     <PageLayout>
       <Home />
-      <WhatIf />
       <Articles />
+      <Shop />
       <ContactMe />
     </PageLayout>
   );
@@ -39,17 +41,10 @@ function MainPage() {
 function App() {
   return (
     <Routes>
+      {/* HOME */}
       <Route path="/" element={<MainPage />} />
 
-      <Route
-        path="/what-if"
-        element={
-          <PageLayout>
-            <WhatIf />
-          </PageLayout>
-        }
-      />
-
+      {/* ARTICLES PAGE */}
       <Route
         path="/articles"
         element={
@@ -59,6 +54,17 @@ function App() {
         }
       />
 
+      {/* ARTICLE DETAIL */}
+      <Route
+        path="/articles/:slug"
+        element={
+          <PageLayout>
+            <ArticleDetail />
+          </PageLayout>
+        }
+      />
+
+      {/* REELS */}
       <Route
         path="/reels"
         element={
@@ -67,42 +73,62 @@ function App() {
           </PageLayout>
         }
       />
+
+      {/* ABOUT */}
       <Route
-  path="/articles/:slug"
+        path="/about"
+        element={
+          <PageLayout>
+            <About />
+          </PageLayout>
+        }
+      />
+      <Route
+  path="/shop"
   element={
     <PageLayout>
-      <ArticleDetail />
-    </PageLayout>
-  }
-/>
-<Route
-  path="/admin"
-  element={
-    <PageLayout>
-      <Admin />
-    </PageLayout>
-  }
-/>
-
-<Route
-  path="/about"
-  element={
-    <PageLayout>
-      <About />
+      <ShopPage />
     </PageLayout>
   }
 />
 
-<Route
-  path="/privacy-policy"
-  element={
-    <PageLayout>
-      <PrivacyPolicy />
-    </PageLayout>
-  }
-/>
+      {/* HIRE */}
+      <Route
+        path="/hire"
+        element={
+          <PageLayout>
+            <Hire />
+          </PageLayout>
+        }
+      />
 
-      <Route path="/articles-page" element={<Navigate to="/articles" replace />} />
+      {/* ADMIN */}
+      <Route
+        path="/admin"
+        element={
+          <PageLayout>
+            <Admin />
+          </PageLayout>
+        }
+      />
+
+      {/* PRIVACY */}
+      <Route
+        path="/privacy-policy"
+        element={
+          <PageLayout>
+            <PrivacyPolicy />
+          </PageLayout>
+        }
+      />
+
+      {/* OLD REDIRECT */}
+      <Route
+        path="/articles-page"
+        element={<Navigate to="/articles" replace />}
+      />
+
+      {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -23,7 +23,8 @@ function Footer() {
             <h4>Quick Links</h4>
 
             <a href="/">Home</a>
-            <a href="/#whatif">What If</a>
+            <a href="/shop">Shop</a>
+       
             <a href="/articles">Articles</a>
             <a href="/about">About</a>
             <a href="/#contact">Contact</a>

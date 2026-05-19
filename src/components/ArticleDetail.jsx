@@ -1,6 +1,6 @@
 import { Link, useParams, Navigate } from "react-router-dom";
 import { articles } from "../data/articles";
-import "./AllArticles.css";
+import "./ArticleDetail.css";
 
 function ArticleDetail() {
   const { slug } = useParams();
