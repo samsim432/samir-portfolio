@@ -57,7 +57,7 @@ function AllArticles() {
           {firebaseArticles.map((article) => (
             <Link
               key={article.id}
-              to={`/articles/${article.slug}`}
+              to={`/articles/${article.slug || article.id}`}
               className="all-article-click"
             >
               <Card className="all-article-card">

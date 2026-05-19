@@ -1,11 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 
-import {
-  collection,
-  onSnapshot,
-  query,
-} from "firebase/firestore";
+import { collection, onSnapshot, query } from "firebase/firestore";
 
 import { db } from "../firebase";
 
@@ -27,7 +23,7 @@ function ArticleDetail() {
       }));
 
       const foundArticle = firebaseArticles.find(
-        (item) => item.slug === slug
+        (item) => item.slug === slug || item.id === slug
       );
 
       setArticle(foundArticle || null);
@@ -61,15 +57,13 @@ function ArticleDetail() {
         <article className="article-detail-page">
           <img src={article.image} alt={article.title} />
 
-          <p className="articles-badge">
-            {article.category}
-          </p>
+          <p className="articles-badge">{article.category}</p>
 
           <h1>{article.title}</h1>
 
-          <p>{article.text}</p>
+          <p className="article-detail-summary">{article.text}</p>
 
-          <div>
+          <div className="article-detail-content">
             {Array.isArray(article.content) &&
               article.content.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>

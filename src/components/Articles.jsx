@@ -61,7 +61,7 @@ function Articles() {
         <div className="articles-grid">
           {articles.map((article) => (
             <Link
-              to={`/articles/${article.slug}`}
+              to={`/articles/${article.slug || article.id}`}
               key={article.id}
               className="article-card-link"
             >
