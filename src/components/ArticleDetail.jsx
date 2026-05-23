@@ -61,7 +61,9 @@ function ArticleDetail() {
 
           <h1>{article.title}</h1>
 
-          <p className="article-detail-summary">{article.text}</p>
+          {article.text && (
+  <p className="article-detail-summary">{article.text}</p>
+)}
 
           <div className="article-detail-content">
             {Array.isArray(article.content) &&
