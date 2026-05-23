@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import SiteBot from "./components/SiteBot";
 
 import Home from "./components/Home";
 import Articles from "./components/Articles";
@@ -25,6 +26,7 @@ function PageLayout({ children }) {
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <SiteBot />
     </>
   );
 }
