@@ -1,18 +1,20 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
+
 import Home from "./components/Home";
 import Articles from "./components/Articles";
 import Shop from "./components/Shop";
-import AllArticles from "./components/AllArticles";
 import ContactMe from "./components/ContactMe";
-import Footer from "./components/Footer";
-import Reels from "./components/Reels";
+
+import AllArticles from "./components/AllArticles";
 import ArticleDetail from "./components/ArticleDetail";
-import Admin from "./components/Admin";
+import Reels from "./components/Reels";
 import About from "./components/About";
-import PrivacyPolicy from "./components/PrivacyPolicy";
 import Hire from "./components/Hire";
+import Admin from "./components/Admin";
+import PrivacyPolicy from "./components/PrivacyPolicy";
 import ShopPage from "./components/ShopPage";
 
 import "./App.css";
@@ -41,10 +43,8 @@ function MainPage() {
 function App() {
   return (
     <Routes>
-      {/* HOME */}
       <Route path="/" element={<MainPage />} />
 
-      {/* ARTICLES PAGE */}
       <Route
         path="/articles"
         element={
@@ -54,7 +54,6 @@ function App() {
         }
       />
 
-      {/* ARTICLE DETAIL */}
       <Route
         path="/articles/:slug"
         element={
@@ -64,7 +63,15 @@ function App() {
         }
       />
 
-      {/* REELS */}
+      <Route
+        path="/shop"
+        element={
+          <PageLayout>
+            <ShopPage />
+          </PageLayout>
+        }
+      />
+
       <Route
         path="/reels"
         element={
@@ -74,7 +81,6 @@ function App() {
         }
       />
 
-      {/* ABOUT */}
       <Route
         path="/about"
         element={
@@ -83,16 +89,7 @@ function App() {
           </PageLayout>
         }
       />
-      <Route
-  path="/shop"
-  element={
-    <PageLayout>
-      <ShopPage />
-    </PageLayout>
-  }
-/>
 
-      {/* HIRE */}
       <Route
         path="/hire"
         element={
@@ -102,7 +99,6 @@ function App() {
         }
       />
 
-      {/* ADMIN */}
       <Route
         path="/admin"
         element={
@@ -112,7 +108,6 @@ function App() {
         }
       />
 
-      {/* PRIVACY */}
       <Route
         path="/privacy-policy"
         element={
@@ -122,13 +117,8 @@ function App() {
         }
       />
 
-      {/* OLD REDIRECT */}
-      <Route
-        path="/articles-page"
-        element={<Navigate to="/articles" replace />}
-      />
+      <Route path="/articles-page" element={<Navigate to="/articles" replace />} />
 
-      {/* 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
