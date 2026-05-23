@@ -12,332 +12,73 @@
   cursor: pointer;
   z-index: 9999;
   box-shadow: 0 18px 45px rgba(2, 132, 199, 0.38);
-  transition: 0.25s ease;
 }
 
-.sitebot-toggle:hover {
-  transform: translateY(-3px) scale(1.04);
-}
-
-.sitebot-box {
+.sitebot-coming-soon {
   position: fixed;
   right: 24px;
   bottom: 105px;
-  width: 410px;
-  height: 620px;
-  border-radius: 28px;
-  overflow: hidden;
+  width: 380px;
   z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.28);
-  border: 1px solid rgba(14, 165, 233, 0.2);
 }
 
-.sitebot-box.light {
-  background: #ffffff;
-  color: #0f172a;
+.sitebot-coming-card {
+  padding: 30px;
+  border-radius: 28px;
+  background: white;
+  border: 1px solid rgba(14, 165, 233, 0.22);
+  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.22);
+  text-align: center;
 }
 
-.sitebot-box.dark {
-  background: #0f172a;
-  color: #e2e8f0;
-  border-color: rgba(148, 163, 184, 0.25);
-}
-
-.sitebot-header {
-  padding: 16px;
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  color: white;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.sitebot-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sitebot-brand strong {
-  display: block;
-  font-size: 16px;
-  font-weight: 950;
-}
-
-.sitebot-brand span {
-  display: block;
-  font-size: 12px;
-  opacity: 0.95;
-}
-
-.sitebot-avatar {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
+.sitebot-coming-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 16px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   background: #e0f2fe;
-  font-size: 17px;
+  font-size: 34px;
 }
 
-.sitebot-header .sitebot-avatar {
-  background: rgba(255, 255, 255, 0.25);
-}
-
-.sitebot-header-actions {
-  display: flex;
-  gap: 6px;
-}
-
-.sitebot-header-actions button {
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  cursor: pointer;
-  font-size: 15px;
-}
-
-.sitebot-quick-buttons {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  overflow-x: auto;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.sitebot-box.dark .sitebot-quick-buttons {
-  border-bottom-color: rgba(148, 163, 184, 0.22);
-}
-
-.sitebot-quick-buttons button {
-  border: none;
+.sitebot-coming-badge {
+  display: inline-flex;
+  margin-bottom: 12px;
+  padding: 7px 14px;
   border-radius: 999px;
-  padding: 8px 13px;
-  background: #e0f2fe;
-  color: #0369a1;
-  font-weight: 900;
-  cursor: pointer;
-  white-space: nowrap;
-}
-
-.sitebot-box.dark .sitebot-quick-buttons button {
-  background: #1e293b;
-  color: #bae6fd;
-}
-
-.sitebot-messages {
-  flex: 1;
-  padding: 16px;
-  overflow-y: auto;
-  background: #f8fafc;
-}
-
-.sitebot-box.dark .sitebot-messages {
-  background: #020617;
-}
-
-.sitebot-row {
-  display: flex;
-  gap: 9px;
-  margin-bottom: 15px;
-  align-items: flex-start;
-}
-
-.sitebot-row.user {
-  flex-direction: row-reverse;
-}
-
-.sitebot-message {
-  max-width: 82%;
-  padding: 13px 15px;
-  border-radius: 18px;
-  font-size: 14px;
-  line-height: 1.6;
-  white-space: pre-line;
-}
-
-.sitebot-message p {
-  margin: 0;
-}
-
-.sitebot-message.user {
-  background: #0284c7;
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
   color: white;
-  border-bottom-right-radius: 6px;
-}
-
-.sitebot-message.bot {
-  background: white;
-  color: #334155;
-  border-bottom-left-radius: 6px;
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-}
-
-.sitebot-box.dark .sitebot-message.bot {
-  background: #1e293b;
-  color: #e2e8f0;
-}
-
-.sitebot-followup {
-  display: block;
-  margin-top: 10px;
-  color: #0284c7;
-  font-weight: 800;
-}
-
-.sitebot-suggestions,
-.sitebot-related {
-  margin-top: 12px;
-  display: grid;
-  gap: 8px;
-}
-
-.sitebot-suggestions a,
-.sitebot-related a {
-  padding: 9px 12px;
-  border-radius: 999px;
-  background: #e0f2fe;
-  color: #0369a1;
-  text-decoration: none;
-  font-weight: 850;
-  font-size: 13px;
-}
-
-.sitebot-box.dark .sitebot-suggestions a,
-.sitebot-box.dark .sitebot-related a {
-  background: #0f172a;
-  color: #bae6fd;
-}
-
-.sitebot-related strong {
   font-size: 12px;
-  color: #64748b;
-}
-
-.sitebot-feedback {
-  margin-top: 11px;
-  display: flex;
-  gap: 7px;
-}
-
-.sitebot-feedback button {
-  border: none;
-  border-radius: 999px;
-  background: #f1f5f9;
-  padding: 6px 9px;
-  cursor: pointer;
-}
-
-.sitebot-box.dark .sitebot-feedback button {
-  background: #334155;
-  color: white;
-}
-
-.typing span {
-  animation: sitebotBlink 1.2s infinite;
-}
-
-.typing span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes sitebotBlink {
-  0%,
-  80%,
-  100% {
-    opacity: 0.2;
-  }
-
-  40% {
-    opacity: 1;
-  }
-}
-
-.sitebot-form {
-  display: flex;
-  gap: 8px;
-  padding: 13px;
-  border-top: 1px solid #e2e8f0;
-  background: white;
-}
-
-.sitebot-box.dark .sitebot-form {
-  background: #0f172a;
-  border-top-color: rgba(148, 163, 184, 0.22);
-}
-
-.sitebot-form input {
-  flex: 1;
-  border: 1px solid #cbd5e1;
-  border-radius: 999px;
-  padding: 11px 14px;
-  outline: none;
-  font-size: 14px;
-}
-
-.sitebot-box.dark .sitebot-form input {
-  background: #020617;
-  color: white;
-  border-color: #334155;
-}
-
-.sitebot-form button {
-  border: none;
-  border-radius: 999px;
-  padding: 10px 14px;
-  background: #0284c7;
-  color: white;
   font-weight: 900;
-  cursor: pointer;
+  text-transform: uppercase;
 }
 
-.sitebot-form button:disabled,
-.sitebot-form input:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
+.sitebot-coming-card h2 {
+  margin: 0 0 12px;
+  color: #0f172a;
+  font-size: 26px;
+  font-weight: 950;
 }
 
-@media (max-width: 600px) {
-  .sitebot-box {
-    right: 10px;
-    left: 10px;
-    bottom: 90px;
+.sitebot-coming-card p {
+  margin: 0;
+  color: #475569;
+  font-size: 15px;
+  line-height: 1.7;
+  font-weight: 600;
+}
+
+@media (max-width: 500px) {
+  .sitebot-coming-soon {
+    left: 14px;
+    right: 14px;
     width: auto;
-    height: 78vh;
-    border-radius: 24px;
+    bottom: 92px;
   }
 
   .sitebot-toggle {
     right: 18px;
     bottom: 18px;
-    width: 58px;
-    height: 58px;
-  }
-
-  .sitebot-message {
-    max-width: 86%;
-    font-size: 13.5px;
-  }
-
-  .sitebot-header {
-    padding: 14px;
-  }
-
-  .sitebot-form {
-    padding: 10px;
-  }
-
-  .sitebot-form button {
-    padding: 10px 12px;
   }
 }
