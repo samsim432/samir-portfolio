@@ -1,84 +1,17 @@
-.sitebot-toggle {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
+.sitebot-close {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  width: 34px;
+  height: 34px;
   border: none;
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  color: white;
-  font-size: 26px;
+  border-radius: 50%;
+  background: #e0f2fe;
+  color: #0284c7;
+  font-size: 24px;
   cursor: pointer;
-  z-index: 9999;
-  box-shadow: 0 18px 45px rgba(2, 132, 199, 0.38);
-}
-
-.sitebot-coming-soon {
-  position: fixed;
-  right: 24px;
-  bottom: 105px;
-  width: 380px;
-  z-index: 9999;
 }
 
 .sitebot-coming-card {
-  padding: 30px;
-  border-radius: 28px;
-  background: white;
-  border: 1px solid rgba(14, 165, 233, 0.22);
-  box-shadow: 0 30px 90px rgba(15, 23, 42, 0.22);
-  text-align: center;
-}
-
-.sitebot-coming-icon {
-  width: 72px;
-  height: 72px;
-  margin: 0 auto 16px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  background: #e0f2fe;
-  font-size: 34px;
-}
-
-.sitebot-coming-badge {
-  display: inline-flex;
-  margin-bottom: 12px;
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #38bdf8, #0284c7);
-  color: white;
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.sitebot-coming-card h2 {
-  margin: 0 0 12px;
-  color: #0f172a;
-  font-size: 26px;
-  font-weight: 950;
-}
-
-.sitebot-coming-card p {
-  margin: 0;
-  color: #475569;
-  font-size: 15px;
-  line-height: 1.7;
-  font-weight: 600;
-}
-
-@media (max-width: 500px) {
-  .sitebot-coming-soon {
-    left: 14px;
-    right: 14px;
-    width: auto;
-    bottom: 92px;
-  }
-
-  .sitebot-toggle {
-    right: 18px;
-    bottom: 18px;
-  }
+  position: relative;
 }
