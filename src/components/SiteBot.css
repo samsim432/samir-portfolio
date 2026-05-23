@@ -14,20 +14,53 @@
   box-shadow: 0 18px 45px rgba(2, 132, 199, 0.38);
 }
 
-.sitebot-coming-soon {
+.sitebot-box {
   position: fixed;
   right: 24px;
   bottom: 105px;
   width: 380px;
-  z-index: 9999;
-}
-
-.sitebot-coming-card {
-  padding: 30px;
-  border-radius: 28px;
   background: white;
+  border-radius: 28px;
+  overflow: hidden;
+  z-index: 9999;
   border: 1px solid rgba(14, 165, 233, 0.22);
   box-shadow: 0 30px 90px rgba(15, 23, 42, 0.22);
+}
+
+.sitebot-header {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #38bdf8, #0284c7);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sitebot-header strong {
+  display: block;
+  font-size: 16px;
+  font-weight: 950;
+}
+
+.sitebot-header span {
+  display: block;
+  font-size: 12px;
+  opacity: 0.9;
+}
+
+.sitebot-header button {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.sitebot-body {
+  padding: 30px;
   text-align: center;
 }
 
@@ -54,14 +87,14 @@
   text-transform: uppercase;
 }
 
-.sitebot-coming-card h2 {
+.sitebot-body h2 {
   margin: 0 0 12px;
   color: #0f172a;
   font-size: 26px;
   font-weight: 950;
 }
 
-.sitebot-coming-card p {
+.sitebot-body p {
   margin: 0;
   color: #475569;
   font-size: 15px;
@@ -70,7 +103,7 @@
 }
 
 @media (max-width: 500px) {
-  .sitebot-coming-soon {
+  .sitebot-box {
     left: 14px;
     right: 14px;
     width: auto;
