@@ -12,6 +12,38 @@ function normalize(text = "") {
     .trim();
 }
 
+function isGreeting(q) {
+  const greetings = [
+    "hi",
+    "hello",
+    "hey",
+    "yo",
+    "hii",
+    "helo",
+    "good morning",
+    "good afternoon",
+    "good evening",
+  ];
+
+  return greetings.some((item) => q === item || q.startsWith(item + " "));
+}
+
+function isThanks(q) {
+  return (
+    q.includes("thank") ||
+    q.includes("thanks") ||
+    q.includes("appreciate")
+  );
+}
+
+function isBye(q) {
+  return (
+    q.includes("bye") ||
+    q.includes("goodbye") ||
+    q.includes("see you")
+  );
+}
+
 function scoreMatch(question, article) {
   const q = normalize(question);
   const title = normalize(article.title);
@@ -58,7 +90,7 @@ function SiteBot() {
   const [messages, setMessages] = useState([
     {
       role: "bot",
-      text: "Hi! Ask me about Samir, articles, reels, shop, or anything on this website.",
+      text: "Hi! I’m Samir AI. I can help you find articles, learn about Samir, visit the shop, or explore this website.",
     },
   ]);
 
@@ -80,6 +112,33 @@ function SiteBot() {
   function answerQuestion(question) {
     const q = normalize(question);
 
+    if (isGreeting(q)) {
+      return {
+        role: "bot",
+        text:
+          "Hello! Nice to see you here 😊 You can ask me about Samir, articles, shop, reels, or anything on this website.",
+        suggestions: [
+          { title: "Show me articles", link: "/articles" },
+          { title: "About Samir", link: "/about" },
+          { title: "Visit Shop", link: "/shop" },
+        ],
+      };
+    }
+
+    if (isThanks(q)) {
+      return {
+        role: "bot",
+        text: "You’re welcome! 😊 Ask me anything else about this website.",
+      };
+    }
+
+    if (isBye(q)) {
+      return {
+        role: "bot",
+        text: "Goodbye! 👋 Come back anytime if you want to explore more.",
+      };
+    }
+
     if (
       q.includes("samir") ||
       q.includes("about you") ||
@@ -88,6 +147,7 @@ function SiteBot() {
       q.includes("who is samir")
     ) {
       return {
+        role: "bot",
         text:
           "Samir is the creator of this website. You can learn more about him on the About page.",
         suggestions: [{ title: "About Samir", link: "/about" }],
@@ -96,6 +156,7 @@ function SiteBot() {
 
     if (q.includes("shop") || q.includes("products") || q.includes("buy")) {
       return {
+        role: "bot",
         text: "You can visit the shop page to see available products.",
         suggestions: [{ title: "Shop", link: "/shop" }],
       };
@@ -103,6 +164,7 @@ function SiteBot() {
 
     if (q.includes("hire") || q.includes("work") || q.includes("contact")) {
       return {
+        role: "bot",
         text: "You can contact or hire Samir from the Hire or Contact section.",
         suggestions: [
           { title: "Hire Samir", link: "/hire" },
@@ -124,6 +186,7 @@ function SiteBot() {
 
       if (bestArticle.score >= 4) {
         return {
+          role: "bot",
           text: makeSummary(bestArticle),
           suggestions: [
             {
@@ -135,7 +198,8 @@ function SiteBot() {
       }
 
       return {
-        text: "I am not fully sure, but you may be asking about one of these articles:",
+        role: "bot",
+        text: "I’m not fully sure, but maybe you mean one of these articles:",
         suggestions: rankedArticles.slice(0, 3).map((article) => ({
           title: article.title,
           link: `/articles/${article.slug || article.id}`,
@@ -144,8 +208,9 @@ function SiteBot() {
     }
 
     return {
+      role: "bot",
       text:
-        "I could not find an exact answer from this website. Try asking with article words like earth, moon, space, Samir, shop, reels, or contact.",
+        "I couldn’t find an exact answer from this website. Try asking with words like earth, moon, space, Samir, shop, reels, or contact.",
       suggestions: articles.slice(0, 3).map((article) => ({
         title: article.title,
         link: `/articles/${article.slug || article.id}`,
@@ -208,7 +273,7 @@ function SiteBot() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about articles, Samir, shop..."
+              placeholder="Say hi or ask about articles..."
             />
             <button type="submit">Send</button>
           </form>
