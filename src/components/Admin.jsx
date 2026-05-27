@@ -1,219 +1,365 @@
 import { useEffect, useMemo, useState } from "react";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import { Link } from "react-router-dom";
 import {
   addDoc,
   collection,
   deleteDoc,
   doc,
   onSnapshot,
-  orderBy,
   query,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import "./Admin.css";
 
-const categories = [
+const ADMIN_PASSWORD = "Samir@321";
+
+const CATEGORY_OPTIONS = [
   "AI",
-  "Robot",
+  "Technology",
   "Space",
-  "Math",
-  "Science",
-  "Future",
+  "Earth",
   "Physics",
-  "Theory",
+  "Chemistry",
+  "General",
 ];
 
-function Admin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const emptyForm = {
+  title: "",
+  slug: "",
+  category: "",
+  images: [""],
+  author: "Samir Simkhada",
+  summary: "",
+  takeaways: "",
+  content: "",
+};
 
-  const [user, setUser] = useState(null);
+function createSlug(text) {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
 
-  const [editingId, setEditingId] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterCategory, setFilterCategory] = useState("All");
-
-  const [publishedArticles, setPublishedArticles] = useState([]);
-  const [products, setProducts] = useState([]);
-
-  const [isPublishing, setIsPublishing] = useState(false);
-  const [isPublishingProduct, setIsPublishingProduct] = useState(false);
-
-  const [formData, setFormData] = useState({
-    title: "",
-    category: "AI",
-    author: "",
-    shortDescription: "",
-    fullDetails: "",
-    image: "",
+function getTodayDate() {
+  return new Date().toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
   });
+}
 
-  const [productForm, setProductForm] = useState({
-    title: "",
-    price: "",
-    description: "",
-    image: "",
-    buyLink: "",
-  });
+function parseContent(contentText) {
+  return contentText
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      if (line.startsWith("## ")) {
+        return {
+          type: "heading",
+          text: line.replace("## ", ""),
+        };
+      }
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+      if (line.startsWith("> ")) {
+        return {
+          type: "quote",
+          text: line.replace("> ", ""),
+        };
+      }
+
+      if (line.startsWith("- ")) {
+        return {
+          type: "list",
+          items: line
+            .split("- ")
+            .map((item) => item.trim())
+            .filter(Boolean),
+        };
+      }
+
+      return {
+        type: "paragraph",
+        text: line,
+      };
     });
+}
 
-    return () => unsubscribe();
-  }, []);
+function stringifyContent(content) {
+  if (!Array.isArray(content)) return "";
+
+  return content
+    .map((block) => {
+      if (typeof block === "string") return block;
+
+      if (block.type === "heading") return `## ${block.text || ""}`;
+      if (block.type === "quote") return `> ${block.text || ""}`;
+      if (block.type === "list" && Array.isArray(block.items)) {
+        return block.items.map((item) => `- ${item}`).join(" ");
+      }
+
+      return block.text || "";
+    })
+    .join("\n\n");
+}
+
+function Admin() {
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    localStorage.getItem("samir-admin-login") === "true"
+  );
+  const [password, setPassword] = useState("");
+  const [articles, setArticles] = useState([]);
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("All");
 
   useEffect(() => {
-    const articlesQuery = query(
-      collection(db, "articles"),
-      orderBy("publishedAt", "desc")
-    );
+    if (!isLoggedIn) return;
+
+    const articlesQuery = query(collection(db, "articles"));
 
     const unsubscribe = onSnapshot(articlesQuery, (snapshot) => {
-      const firebaseArticles = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
+      const firebaseArticles = snapshot.docs.map((item) => ({
+        id: item.id,
+        ...item.data(),
       }));
 
-      setPublishedArticles(firebaseArticles);
+      setArticles(firebaseArticles);
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [isLoggedIn]);
 
-  useEffect(() => {
-    const productsQuery = query(
-      collection(db, "products"),
-      orderBy("publishedAt", "desc")
-    );
-
-    const unsubscribe = onSnapshot(productsQuery, (snapshot) => {
-      const firebaseProducts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setProducts(firebaseProducts);
-    });
-
-    return () => unsubscribe();
+  const categories = useMemo(() => {
+    return ["All", ...CATEGORY_OPTIONS];
   }, []);
 
   const filteredArticles = useMemo(() => {
-    return publishedArticles.filter((article) => {
-      const title = article.title || "";
-      const text = article.text || "";
-      const author = article.author || "";
-
+    return articles.filter((article) => {
       const matchesSearch =
-        title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        author.toLowerCase().includes(searchTerm.toLowerCase());
+        article.title?.toLowerCase().includes(search.toLowerCase()) ||
+        article.category?.toLowerCase().includes(search.toLowerCase()) ||
+        article.summary?.toLowerCase().includes(search.toLowerCase()) ||
+        article.text?.toLowerCase().includes(search.toLowerCase());
 
       const matchesCategory =
-        filterCategory === "All" || article.category === filterCategory;
+        categoryFilter === "All" || article.category === categoryFilter;
 
       return matchesSearch && matchesCategory;
     });
-  }, [publishedArticles, searchTerm, filterCategory]);
+  }, [articles, search, categoryFilter]);
 
-  const totalArticles = publishedArticles.length;
-  const totalProducts = products.length;
-  const totalCategories = new Set(publishedArticles.map((a) => a.category)).size;
-  const latestArticle = publishedArticles[0];
+  const latestArticle = articles[0];
 
-  async function handleLogin(e) {
-    e.preventDefault();
+  const handleLogin = (event) => {
+    event.preventDefault();
+
+    if (password === ADMIN_PASSWORD) {
+      localStorage.setItem("samir-admin-login", "true");
+      setIsLoggedIn(true);
+      setPassword("");
+    } else {
+      alert("Wrong password");
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("samir-admin-login");
+    setIsLoggedIn(false);
+  };
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+      ...(name === "title" && !editingId
+        ? {
+            slug: createSlug(value),
+          }
+        : {}),
+    }));
+  };
+
+  const handleImageChange = (index, value) => {
+    setForm((current) => {
+      const updatedImages = [...current.images];
+      updatedImages[index] = value;
+
+      return {
+        ...current,
+        images: updatedImages,
+      };
+    });
+  };
+
+  const addImageField = () => {
+    setForm((current) => ({
+      ...current,
+      images: [...current.images, ""],
+    }));
+  };
+
+  const removeImageField = (index) => {
+    setForm((current) => {
+      const updatedImages = current.images.filter((_, itemIndex) => {
+        return itemIndex !== index;
+      });
+
+      return {
+        ...current,
+        images: updatedImages.length > 0 ? updatedImages : [""],
+      };
+    });
+  };
+
+  const resetForm = () => {
+    setForm(emptyForm);
+    setEditingId(null);
+  };
+
+  const validateForm = () => {
+    const cleanImages = form.images.map((image) => image.trim()).filter(Boolean);
+    const cleanTakeaways = form.takeaways
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    if (!form.title.trim()) {
+      alert("Article title is required.");
+      return false;
+    }
+
+    if (!form.slug.trim()) {
+      alert("Article slug is required.");
+      return false;
+    }
+
+    if (!form.category.trim()) {
+      alert("Please select a category.");
+      return false;
+    }
+
+    if (!CATEGORY_OPTIONS.includes(form.category)) {
+      alert("Please select a valid category.");
+      return false;
+    }
+
+    if (cleanImages.length === 0) {
+      alert("At least one image URL is required.");
+      return false;
+    }
+
+    if (!form.author.trim()) {
+      alert("Author name is required.");
+      return false;
+    }
+
+    if (!form.summary.trim()) {
+      alert("Article summary is required.");
+      return false;
+    }
+
+    if (cleanTakeaways.length === 0) {
+      alert("At least one key takeaway is required.");
+      return false;
+    }
+
+    if (!form.content.trim()) {
+      alert("Article content is required.");
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!validateForm()) return;
+
+    setSaving(true);
+
+    const cleanImages = form.images.map((image) => image.trim()).filter(Boolean);
+    const cleanTakeaways = form.takeaways
+      .split("\n")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const articleData = {
+      title: form.title.trim(),
+      slug: form.slug.trim() || createSlug(form.title),
+      category: form.category.trim(),
+      images: cleanImages,
+      image: cleanImages[0],
+      author: form.author.trim(),
+      date: editingId ? undefined : getTodayDate(),
+      summary: form.summary.trim(),
+      text: form.summary.trim(),
+      takeaways: cleanTakeaways,
+      content: parseContent(form.content),
+      updatedAt: serverTimestamp(),
+    };
 
     try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      if (editingId) {
+        const dataToUpdate = { ...articleData };
+        delete dataToUpdate.date;
 
-      setUser(userCredential.user);
+        await updateDoc(doc(db, "articles", editingId), dataToUpdate);
+        alert("Article updated successfully!");
+      } else {
+   await addDoc(collection(db, "articles"), {
+  ...articleData,
+  createdAt: serverTimestamp(),
+  publishedAt: serverTimestamp(),
+});
+        alert("Article published successfully!");
+      }
+
+      resetForm();
     } catch (error) {
-      alert("Login failed: " + error.message);
+      console.error(error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setSaving(false);
     }
-  }
+  };
 
-  async function handleLogout() {
-    await signOut(auth);
-    setUser(null);
-    setEmail("");
-    setPassword("");
-    resetArticleForm();
-    resetProductForm();
-  }
-
-  function handleArticleChange(e) {
-    const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  function handleProductChange(e) {
-    const { name, value } = e.target;
-
-    setProductForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  }
-
-  function resetArticleForm() {
-    setFormData({
-      title: "",
-      category: "AI",
-      author: "",
-      shortDescription: "",
-      fullDetails: "",
-      image: "",
-    });
-
-    setEditingId(null);
-  }
-
-  function resetProductForm() {
-    setProductForm({
-      title: "",
-      price: "",
-      description: "",
-      image: "",
-      buyLink: "",
-    });
-  }
-
-  function handleEditArticle(article) {
+  const handleEdit = (article) => {
     setEditingId(article.id);
 
-    setFormData({
+    setForm({
       title: article.title || "",
-      category: article.category || "AI",
-      author: article.author || "",
-      shortDescription: article.text || "",
-      fullDetails: Array.isArray(article.content)
-        ? article.content.join("\n")
+      slug: article.slug || "",
+      category: article.category || "",
+      images:
+        Array.isArray(article.images) && article.images.length > 0
+          ? article.images
+          : [article.image || ""],
+      author: article.author || "Samir Simkhada",
+      summary: article.summary || article.text || "",
+      takeaways: Array.isArray(article.takeaways)
+        ? article.takeaways.join("\n")
         : "",
-      image: article.image || "",
+      content: stringifyContent(article.content),
     });
 
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
 
-  async function handleDeleteArticle(id) {
+  const handleDelete = async (articleId) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this article?"
     );
@@ -221,148 +367,29 @@ function Admin() {
     if (!confirmDelete) return;
 
     try {
-      await deleteDoc(doc(db, "articles", id));
-      alert("Article deleted successfully.");
+      await deleteDoc(doc(db, "articles", articleId));
+      alert("Article deleted successfully!");
     } catch (error) {
-      alert("Delete failed: " + error.message);
+      console.error(error);
+      alert("Could not delete article.");
     }
-  }
-
-  async function handleDeleteProduct(id) {
-    const confirmDelete = window.confirm("Are you sure you want to delete this product?");
-
-    if (!confirmDelete) return;
-
-    try {
-      await deleteDoc(doc(db, "products", id));
-      alert("Product deleted successfully.");
-    } catch (error) {
-      alert("Delete failed: " + error.message);
-    }
-  }
-
-  async function handlePublishArticle(e) {
-    e.preventDefault();
-
-    if (!formData.image) {
-      alert("Please paste an article image URL.");
-      return;
-    }
-
-    setIsPublishing(true);
-
-// inside handlePublishArticle
-
-try {
-  const slug = formData.title
-    .toLowerCase()
-    .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-");
-
-  const newArticle = {
-    slug,
-    title: formData.title,
-    category: formData.category,
-    tag: formData.category,
-    author: formData.author,
-    text: formData.shortDescription,
-    content: formData.fullDetails
-      .split("\n")
-      .filter((paragraph) => paragraph.trim() !== ""),
-    image: formData.image,
-    publishedAt: serverTimestamp(),
-    updatedAt: null,
   };
 
-      if (editingId) {
-        const oldArticle = publishedArticles.find(
-          (article) => article.id === editingId
-        );
-
-        await updateDoc(doc(db, "articles", editingId), {
-          ...newArticle,
-          publishedAt: oldArticle?.publishedAt || serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        });
-
-        setEditingId(null);
-      } else {
-        await addDoc(collection(db, "articles"), newArticle);
-      }
-
-      resetArticleForm();
-
-      alert(
-        editingId
-          ? "Article updated successfully."
-          : "Article published successfully."
-      );
-    } catch (error) {
-      alert("Publish failed: " + error.message);
-    } finally {
-      setIsPublishing(false);
-    }
-  }
-
-  async function handlePublishProduct(e) {
-    e.preventDefault();
-
-    if (!productForm.image) {
-      alert("Please paste a product image URL.");
-      return;
-    }
-
-    if (!productForm.buyLink) {
-      alert("Please paste your PDF/buy/download link.");
-      return;
-    }
-
-    setIsPublishingProduct(true);
-
-    try {
-      await addDoc(collection(db, "products"), {
-        title: productForm.title,
-        price: productForm.price,
-        description: productForm.description,
-        image: productForm.image,
-        buyLink: productForm.buyLink,
-        publishedAt: serverTimestamp(),
-      });
-
-      resetProductForm();
-
-      alert("Product published successfully.");
-    } catch (error) {
-      alert("Product publish failed: " + error.message);
-    } finally {
-      setIsPublishingProduct(false);
-    }
-  }
-
-  if (!user) {
+  if (!isLoggedIn) {
     return (
       <section className="admin-login-page">
-        <form onSubmit={handleLogin} className="admin-login-card">
+        <form className="admin-login-card" onSubmit={handleLogin}>
           <div className="admin-login-icon">🔐</div>
 
           <h1>Admin Login</h1>
-
-          <p>Enter your Firebase admin email and password.</p>
-
-          <input
-            type="email"
-            placeholder="Admin email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <p>Enter your admin password to manage articles.</p>
 
           <input
             type="password"
             placeholder="Admin password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
             required
+            onChange={(event) => setPassword(event.target.value)}
           />
 
           <button type="submit">Login</button>
@@ -375,18 +402,22 @@ try {
     <section className="admin-page">
       <aside className="admin-sidebar">
         <div>
-          <h2>Admin</h2>
-          <p>Dashboard</p>
+          <h2>Samir</h2>
+          <p>Portfolio Admin</p>
+
+          <nav>
+            <a href="#write">Write Article</a>
+            <a href="#manage">Manage Articles</a>
+            <Link to="/articles">View Articles</Link>
+            <Link to="/">Visit Website</Link>
+          </nav>
         </div>
 
-        <nav>
-          <a href="#overview">Overview</a>
-          <a href="#editor">Create Article</a>
-          <a href="#manage">Manage Articles</a>
-          <a href="#products">Digital Products</a>
-        </nav>
-
-        <button onClick={handleLogout} className="admin-sidebar-logout">
+        <button
+          type="button"
+          className="admin-sidebar-logout"
+          onClick={handleLogout}
+        >
           Logout
         </button>
       </aside>
@@ -394,158 +425,232 @@ try {
       <main className="admin-main">
         <header className="admin-header">
           <div>
-            <p className="admin-eyebrow">Welcome back</p>
-            <h1>Professional Admin Dashboard</h1>
+            <p className="admin-eyebrow">Dashboard</p>
+            <h1>Article Manager</h1>
             <p className="admin-subtitle">
-              Create articles, manage products, and upload PDF product links.
+              Create reader-friendly articles with image, category, author,
+              automatic date, reading time, summary and key takeaways.
             </p>
           </div>
 
           <div className="admin-header-actions">
-            <button onClick={resetArticleForm} className="admin-light-btn">
-              Clear Article
+            <button type="button" className="admin-light-btn" onClick={resetForm}>
+              New Article
             </button>
 
-            <button onClick={resetProductForm} className="admin-light-btn">
-              Clear Product
-            </button>
-
-            <button onClick={handleLogout} className="admin-danger-btn">
-              Logout
-            </button>
+            <Link to="/articles" className="admin-danger-btn">
+              View Site
+            </Link>
           </div>
         </header>
 
-        <section id="overview" className="admin-stats-grid">
+        <section className="admin-stats-grid">
           <div className="admin-stat-card">
             <p>Total Articles</p>
-            <h2>{totalArticles}</h2>
+            <h2>{articles.length}</h2>
           </div>
 
           <div className="admin-stat-card">
-            <p>Total Products</p>
-            <h2>{totalProducts}</h2>
+            <p>Categories</p>
+            <h2>{CATEGORY_OPTIONS.length}</h2>
           </div>
 
           <div className="admin-stat-card">
-            <p>Categories Used</p>
-            <h2>{totalCategories}</h2>
-          </div>
-
-          <div className="admin-stat-card admin-wide-stat">
             <p>Latest Article</p>
-            <h3>{latestArticle ? latestArticle.title : "No articles yet"}</h3>
+            <h3>{latestArticle?.title || "No article yet"}</h3>
           </div>
         </section>
 
-        <section id="editor" className="admin-panel">
+        <section className="admin-panel" id="write">
           <div className="admin-panel-header">
             <div>
-              <h2>{editingId ? "Edit Article" : "Create New Article"}</h2>
-              <p>Write and publish articles from desktop or mobile.</p>
+              <h2>{editingId ? "Edit Article" : "Write New Article"}</h2>
+              <p>
+                All fields are required. The article date will be added
+                automatically when you publish.
+              </p>
             </div>
 
             {editingId && <span className="admin-editing-badge">Editing</span>}
           </div>
 
-          <form onSubmit={handlePublishArticle} className="admin-form">
+          <form className="admin-form" onSubmit={handleSubmit}>
             <div className="admin-two-column">
               <div>
-                <label>Article Title</label>
+                <label>Article Title *</label>
                 <input
                   type="text"
                   name="title"
-                  placeholder="Enter article title"
-                  value={formData.title}
-                  onChange={handleArticleChange}
+                  placeholder="Example: How AI Is Changing Web Development"
+                  value={form.title}
                   required
+                  onChange={handleChange}
                 />
               </div>
 
               <div>
-                <label>Category</label>
+                <label>Slug *</label>
+                <input
+                  type="text"
+                  name="slug"
+                  placeholder="how-ai-is-changing-web-development"
+                  value={form.slug}
+                  required
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="admin-two-column">
+              <div>
+                <label>Category *</label>
                 <select
                   name="category"
-                  value={formData.category}
-                  onChange={handleArticleChange}
+                  value={form.category}
                   required
+                  onChange={handleChange}
                 >
-                  {categories.map((category) => (
+                  <option value="">Select category</option>
+                  {CATEGORY_OPTIONS.map((category) => (
                     <option key={category} value={category}>
                       {category}
                     </option>
                   ))}
                 </select>
               </div>
+
+              <div>
+                <label>Author *</label>
+                <input
+                  type="text"
+                  name="author"
+                  placeholder="Samir Simkhada"
+                  value={form.author}
+                  required
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-            <label>Written By</label>
-            <input
-              type="text"
-              name="author"
-              placeholder="Author name"
-              value={formData.author}
-              onChange={handleArticleChange}
-              required
-            />
+            <div className="admin-date-note">
+              <strong>Automatic date:</strong>{" "}
+              {editingId
+                ? "Existing article date will stay the same."
+                : getTodayDate()}
+            </div>
 
-            <label>Article Image URL</label>
-            <input
-              type="text"
-              name="image"
-              placeholder="Paste image URL here"
-              value={formData.image}
-              onChange={handleArticleChange}
-              required
-            />
+            <label>Image URLs *</label>
 
-            {formData.image && (
-              <img
-                src={formData.image}
-                alt="Article preview"
-                className="admin-preview-image"
-              />
-            )}
+            <div className="admin-image-fields">
+              {form.images.map((imageUrl, index) => (
+                <div key={index} className="admin-image-row">
+                  <input
+                    type="url"
+                    placeholder={`Image URL ${index + 1}`}
+                    value={imageUrl}
+                    required={index === 0}
+                    onChange={(event) =>
+                      handleImageChange(index, event.target.value)
+                    }
+                  />
 
-            <label>Short Description</label>
-            <textarea
-              name="shortDescription"
-              placeholder="Short article summary"
-              value={formData.shortDescription}
-              onChange={handleArticleChange}
-              required
-              rows="3"
-            />
-
-            <label>Full Article Details</label>
-            <textarea
-              name="fullDetails"
-              placeholder="Write full article details. Use new lines for separate paragraphs."
-              value={formData.fullDetails}
-              onChange={handleArticleChange}
-              required
-              rows="10"
-            />
+                  <button
+                    type="button"
+                    className="admin-remove-image-btn"
+                    onClick={() => removeImageField(index)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
 
             <button
-              type="submit"
-              disabled={isPublishing}
-              className="admin-primary-btn"
+              type="button"
+              className="admin-add-image-btn"
+              onClick={addImageField}
             >
-              {isPublishing
-                ? "Publishing..."
+              + Add another image
+            </button>
+
+            {form.images.filter(Boolean).length > 0 && (
+              <div className="admin-preview-grid">
+                {form.images
+                  .map((image) => image.trim())
+                  .filter(Boolean)
+                  .map((image) => (
+                    <img key={image} src={image} alt="Article preview" />
+                  ))}
+              </div>
+            )}
+
+            <label>Article Summary *</label>
+            <textarea
+              name="summary"
+              rows="4"
+              placeholder="Write a short, friendly summary of the article..."
+              value={form.summary}
+              required
+              onChange={handleChange}
+            />
+
+            <label>Key Takeaways *</label>
+            <textarea
+              name="takeaways"
+              rows="5"
+              placeholder={`Write one takeaway per line:\nAI can help developers work faster\nGood design makes articles easier to read\nShort sections improve reader focus`}
+              value={form.takeaways}
+              required
+              onChange={handleChange}
+            />
+
+            <label>Article Content *</label>
+            <textarea
+              name="content"
+              rows="16"
+              placeholder={`Write your article here.
+
+Use:
+## Heading
+Normal paragraph text
+> Quote text
+- List item one - List item two - List item three`}
+              value={form.content}
+              required
+              onChange={handleChange}
+            />
+
+            <div className="admin-writing-help">
+              <h3>Writing format</h3>
+              <p>
+                <strong>Heading:</strong> Start a line with ## Example heading
+              </p>
+              <p>
+                <strong>Quote:</strong> Start a line with &gt; Your quote
+              </p>
+              <p>
+                <strong>List:</strong> Start a line with - Item one - Item two
+              </p>
+              <p>
+                <strong>Paragraph:</strong> Write normal text on its own line
+              </p>
+            </div>
+
+            <button type="submit" className="admin-primary-btn" disabled={saving}>
+              {saving
+                ? "Saving..."
                 : editingId
-                ? "Update Article"
-                : "Publish Article"}
+                  ? "Update Article"
+                  : "Publish Article"}
             </button>
           </form>
         </section>
 
-        <section id="manage" className="admin-panel">
+        <section className="admin-panel" id="manage">
           <div className="admin-panel-header">
             <div>
               <h2>Manage Articles</h2>
-              <p>Search, edit, or delete published articles.</p>
+              <p>Edit, delete and search your published articles.</p>
             </div>
           </div>
 
@@ -553,19 +658,16 @@ try {
             <input
               type="text"
               placeholder="Search articles..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
             />
 
             <select
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
+              value={categoryFilter}
+              onChange={(event) => setCategoryFilter(event.target.value)}
             >
-              <option value="All">All Categories</option>
               {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
+                <option key={category}>{category}</option>
               ))}
             </select>
           </div>
@@ -573,180 +675,63 @@ try {
           {filteredArticles.length === 0 ? (
             <div className="admin-empty-state">
               <h3>No articles found</h3>
-              <p>Create a new article or change your search filters.</p>
+              <p>Create your first article or adjust your search.</p>
             </div>
           ) : (
             <div className="admin-list">
-              {filteredArticles.map((article) => (
-                <article key={article.id} className="admin-list-card">
-                  {article.image && (
-                    <img src={article.image} alt={article.title} />
+              {filteredArticles.map((item) => (
+                <div key={item.id} className="admin-list-card">
+                  {item.image ? (
+                    <img src={item.image} alt={item.title} />
+                  ) : (
+                    <div className="admin-list-placeholder">No Image</div>
                   )}
 
                   <div className="admin-list-content">
-                    <div className="admin-list-top">
-                      <span>{article.category}</span>
-                      <small>{article.updatedAt ? "Updated" : "Published"}</small>
+                    <div>
+                      <div className="admin-list-top">
+                        <span>{item.category || "Uncategorized"}</span>
+                        <small>{item.date || "No date"}</small>
+                      </div>
+
+                      <h3>{item.title}</h3>
+
+                      {(item.summary || item.text) && (
+                        <p>{item.summary || item.text}</p>
+                      )}
+
+                      <strong>By {item.author || "Samir Simkhada"}</strong>
                     </div>
 
-                    <h3>{article.title}</h3>
-                    <p>{article.text}</p>
-                    <strong>By {article.author}</strong>
-
                     <div className="admin-button-row">
+                      <Link
+                        to={`/articles/${item.slug || item.id}`}
+                        className="admin-view-btn"
+                      >
+                        View
+                      </Link>
+
                       <button
-                        onClick={() => handleEditArticle(article)}
+                        type="button"
                         className="admin-edit-btn"
+                        onClick={() => handleEdit(item)}
                       >
                         Edit
                       </button>
 
                       <button
-                        onClick={() => handleDeleteArticle(article.id)}
+                        type="button"
                         className="admin-delete-btn"
+                        onClick={() => handleDelete(item.id)}
                       >
                         Delete
                       </button>
                     </div>
                   </div>
-                </article>
+                </div>
               ))}
             </div>
           )}
-        </section>
-
-        <section id="products" className="admin-panel">
-          <div className="admin-panel-header">
-            <div>
-              <h2>Digital Products</h2>
-              <p>
-                Add PDFs, guides, eBooks, and paid/downloadable product links.
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handlePublishProduct} className="admin-form">
-            <label>Product Title</label>
-            <input
-              type="text"
-              name="title"
-              placeholder="Example: AI Guide PDF"
-              value={productForm.title}
-              onChange={handleProductChange}
-              required
-            />
-
-            <div className="admin-two-column">
-              <div>
-                <label>Price</label>
-                <input
-                  type="text"
-                  name="price"
-                  placeholder="£4.99 or Free"
-                  value={productForm.price}
-                  onChange={handleProductChange}
-                  required
-                />
-              </div>
-
-              <div>
-                <label>Product Image URL</label>
-                <input
-                  type="text"
-                  name="image"
-                  placeholder="Paste image URL"
-                  value={productForm.image}
-                  onChange={handleProductChange}
-                  required
-                />
-              </div>
-            </div>
-
-            <label>Product Description</label>
-            <textarea
-              name="description"
-              placeholder="Write short product description"
-              value={productForm.description}
-              onChange={handleProductChange}
-              required
-              rows="4"
-            />
-
-            <label>PDF / Buy / Download Link</label>
-            <input
-              type="text"
-              name="buyLink"
-              placeholder="Google Drive, Gumroad, Payhip, Ko-fi, Buy Me a Coffee link"
-              value={productForm.buyLink}
-              onChange={handleProductChange}
-              required
-            />
-
-            {productForm.image && (
-              <img
-                src={productForm.image}
-                alt="Product preview"
-                className="admin-preview-image"
-              />
-            )}
-
-            <button
-              type="submit"
-              disabled={isPublishingProduct}
-              className="admin-primary-btn"
-            >
-              {isPublishingProduct ? "Publishing..." : "Publish Product"}
-            </button>
-          </form>
-
-          <div className="admin-product-manage">
-            <h2>Manage Products</h2>
-
-            {products.length === 0 ? (
-              <div className="admin-empty-state">
-                <h3>No products yet</h3>
-                <p>Add your first PDF or digital product above.</p>
-              </div>
-            ) : (
-              <div className="admin-list">
-                {products.map((product) => (
-                  <article key={product.id} className="admin-list-card">
-                    {product.image && (
-                      <img src={product.image} alt={product.title} />
-                    )}
-
-                    <div className="admin-list-content">
-                      <div className="admin-list-top">
-                        <span>{product.price}</span>
-                        <small>Product</small>
-                      </div>
-
-                      <h3>{product.title}</h3>
-                      <p>{product.description}</p>
-
-                      <div className="admin-button-row">
-                        <a
-                          href={product.buyLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="admin-edit-btn"
-                        >
-                          Open Link
-                        </a>
-
-                        <button
-                          onClick={() => handleDeleteProduct(product.id)}
-                          className="admin-delete-btn"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
-          </div>
         </section>
       </main>
     </section>

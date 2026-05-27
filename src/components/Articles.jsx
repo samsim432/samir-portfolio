@@ -18,7 +18,7 @@ function Articles() {
   useEffect(() => {
     const articlesQuery = query(
       collection(db, "articles"),
-      orderBy("publishedAt", "desc")
+      orderBy("createdAt", "desc")
     );
 
     const unsubscribe = onSnapshot(articlesQuery, (snapshot) => {
