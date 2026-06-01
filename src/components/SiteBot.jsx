@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import "./SiteBot.css";
 
 function SiteBot() {
@@ -7,36 +8,95 @@ function SiteBot() {
   return (
     <>
       <button
-        className="sitebot-toggle"
+        className={`sitebot-toggle ${open ? "sitebot-toggle-open" : ""}`}
         onClick={() => setOpen(!open)}
-        aria-label="Open Samir AI"
+        aria-label="Open Samir AI Assistant"
+        type="button"
       >
-        <span>🤖</span>
+        <span>{open ? "×" : "🤖"}</span>
       </button>
 
       {open && (
         <div className="sitebot-box">
           <div className="sitebot-header">
-            <div>
-              <strong>Samir AI</strong>
-              <span>Website assistant</span>
+            <div className="sitebot-header-left">
+              <div className="sitebot-avatar">🤖</div>
+
+              <div>
+                <strong>Samir AI</strong>
+
+                <span>
+                  <i></i>
+                  Coming Soon
+                </span>
+              </div>
             </div>
 
-            <button onClick={() => setOpen(false)}>×</button>
+            <button
+              type="button"
+              className="sitebot-close"
+              onClick={() => setOpen(false)}
+              aria-label="Close Samir AI Assistant"
+            >
+              ×
+            </button>
           </div>
 
           <div className="sitebot-body">
-            <div className="sitebot-coming-icon">🤖</div>
+            <div className="sitebot-message bot">
+              <p>
+                Hi, I’m <strong>Samir AI</strong>. Soon I’ll help visitors
+                explore articles, learn about Samir, view projects, and contact
+                easily.
+              </p>
+            </div>
 
-            <p className="sitebot-coming-badge">Coming Soon</p>
+            <div className="sitebot-suggestions">
+              <Link to="/about" onClick={() => setOpen(false)}>
+                About Samir
+              </Link>
 
-            <h2>Samir AI Assistant</h2>
+              <Link to="/articles" onClick={() => setOpen(false)}>
+                Latest Articles
+              </Link>
 
-            <p>
-              A smart website assistant is coming soon. It will help users find
-              articles, learn about Samir, explore the shop, and ask questions
-              about the website.
-            </p>
+              <Link to="/shop" onClick={() => setOpen(false)}>
+                Explore Shop
+              </Link>
+
+              <Link to="/hire" onClick={() => setOpen(false)}>
+                Hire Me
+              </Link>
+            </div>
+
+            <div className="sitebot-info-card">
+              <p className="sitebot-coming-badge">Coming Soon</p>
+
+              <h2>Smart website assistant</h2>
+
+              <p>
+                This assistant will answer questions, recommend content, guide
+                visitors, and make the website easier to use.
+              </p>
+            </div>
+
+            <div className="sitebot-typing">
+              <span></span>
+              <span></span>
+              <span></span>
+            </div>
+          </div>
+
+          <div className="sitebot-footer">
+            <input
+              type="text"
+              placeholder="Ask me anything... coming soon"
+              disabled
+            />
+
+            <button type="button" disabled>
+              Send
+            </button>
           </div>
         </div>
       )}

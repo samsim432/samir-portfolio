@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import {
   collection,
   onSnapshot,
-  orderBy,
+  
   query,
 } from "firebase/firestore";
 
@@ -16,10 +16,7 @@ function Articles() {
   const [firebaseArticles, setFirebaseArticles] = useState([]);
 
   useEffect(() => {
-    const articlesQuery = query(
-      collection(db, "articles"),
-      orderBy("createdAt", "desc")
-    );
+  const articlesQuery = query(collection(db, "articles"));
 
     const unsubscribe = onSnapshot(articlesQuery, (snapshot) => {
       const articlesFromFirebase = snapshot.docs.map((doc) => ({
