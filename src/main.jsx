@@ -1,6 +1,7 @@
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, useLocation } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 
 import "./index.css";
 import "./styles/global.css";
@@ -22,9 +23,11 @@ initGA();
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <AnalyticsTracker />
-      <App />
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <AnalyticsTracker />
+        <App />
+      </BrowserRouter>
+    </HelmetProvider>
   </StrictMode>
 );

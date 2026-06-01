@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { collection, onSnapshot, query } from "firebase/firestore";
+import { Helmet } from "react-helmet-async";
 import { db } from "../firebase";
 import "./ArticleDetail.css";
 
@@ -235,271 +236,340 @@ function ArticleDetail() {
     return <Navigate to="/articles" replace />;
   }
 
-  const articleSummary = article.summary || article.text;
+  const articleSummary =
+    article.summary ||
+    article.text ||
+    "Read educational articles about science, AI, space, technology, and imagination.";
+
   const articleAuthor = article.author || "Samir Simkhada";
   const mainImage = articleImages[0];
 
+  const seoTitle = `${article.title || "Article"} | Samir Simkhada`;
+
+  const seoDescription =
+    articleSummary.length > 155
+      ? `${articleSummary.slice(0, 152)}...`
+      : articleSummary;
+
+  const seoImage =
+    mainImage || "https://samirsimkhada.com.np/og-image.png";
+
+  const canonicalUrl = `https://samirsimkhada.com.np/articles/${
+    article.slug || article.id
+  }`;
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title || "Article by Samir Simkhada",
+    description: seoDescription,
+    image: seoImage,
+    author: {
+      "@type": "Person",
+      name: articleAuthor,
+      url: "https://samirsimkhada.com.np/",
+    },
+    publisher: {
+      "@type": "Person",
+      name: "Samir Simkhada",
+      url: "https://samirsimkhada.com.np/",
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": canonicalUrl,
+    },
+  };
+
   return (
-    <section className="article-detail-shell">
-      <div className="reading-progress">
-        <div
-          className="reading-progress-fill"
-          style={{ width: `${scrollProgress}%` }}
-        />
-      </div>
+    <>
+      <Helmet>
+        <title>{seoTitle}</title>
 
-      <div className="article-detail-container">
-        <Link to="/articles" className="article-back-link">
-          ← Back to Articles
-        </Link>
+        <meta name="description" content={seoDescription} />
 
-        <article className="article-detail-card">
-          {mainImage && (
-            <div className="article-hero-image-wrap">
-              <img src={mainImage} alt={article.title} />
-            </div>
-          )}
+        <link rel="canonical" href={canonicalUrl} />
 
-          <header className="article-header">
-            <div className="article-topline">
-              <span className="article-category">
-                {article.category || "General"}
-              </span>
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content="Samir Simkhada" />
+        <meta property="og:title" content={seoTitle} />
+        <meta property="og:description" content={seoDescription} />
+        <meta property="og:image" content={seoImage} />
+        <meta property="og:url" content={canonicalUrl} />
 
-              <span className="article-read-pill">
-                {readingStats.readingTime} min read
-              </span>
-            </div>
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={seoTitle} />
+        <meta name="twitter:description" content={seoDescription} />
+        <meta name="twitter:image" content={seoImage} />
 
-            <h1>{article.title}</h1>
+        <script type="application/ld+json">
+          {JSON.stringify(articleSchema)}
+        </script>
+      </Helmet>
 
-            <div className="article-author-card">
-              <div className="article-author-avatar">
-                {articleAuthor.charAt(0)}
+      <section className="article-detail-shell">
+        <div className="reading-progress">
+          <div
+            className="reading-progress-fill"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+
+        <div className="article-detail-container">
+          <Link to="/articles" className="article-back-link">
+            ← Back to Articles
+          </Link>
+
+          <article className="article-detail-card">
+            {mainImage && (
+              <div className="article-hero-image-wrap">
+                <img src={mainImage} alt={article.title} />
               </div>
-
-              <div>
-                <p>Written by {articleAuthor}</p>
-
-                <div className="article-meta">
-                  {article.date && <span>{article.date}</span>}
-                  <span>{readingStats.wordCount} words</span>
-                  <span>Reader friendly</span>
-                </div>
-              </div>
-            </div>
-
-            {articleSummary && (
-              <p className="article-detail-summary">{articleSummary}</p>
             )}
-          </header>
 
-          <section className="reader-tools">
-            <div className="reader-tool-group">
-              <span>Text size</span>
+            <header className="article-header">
+              <div className="article-topline">
+                <span className="article-category">
+                  {article.category || "General"}
+                </span>
 
-              <button type="button" onClick={decreaseFontSize}>
-                A-
-              </button>
+                <span className="article-read-pill">
+                  {readingStats.readingTime} min read
+                </span>
+              </div>
 
-              <button type="button" onClick={resetFontSize}>
-                Reset
-              </button>
+              <h1>{article.title}</h1>
 
-              <button type="button" onClick={increaseFontSize}>
-                A+
-              </button>
-            </div>
-
-            <div className="reader-tool-group">
-              {!isSpeaking ? (
-                <button type="button" onClick={listenToArticle}>
-                  🔊 Listen
-                </button>
-              ) : (
-                <button type="button" onClick={stopListening}>
-                  ⏹ Stop
-                </button>
-              )}
-
-              <button type="button" onClick={copyArticleLink}>
-                🔗 Copy link
-              </button>
-            </div>
-          </section>
-
-          {keyTakeaways.length > 0 && (
-            <section className="key-takeaways">
-              <div className="key-takeaways-heading">
-                <span>✨</span>
+              <div className="article-author-card">
+                <div className="article-author-avatar">
+                  {articleAuthor.charAt(0)}
+                </div>
 
                 <div>
-                  <p>Key takeaways</p>
-                  <small>Quick points before reading the full article.</small>
+                  <p>Written by {articleAuthor}</p>
+
+                  <div className="article-meta">
+                    {article.date && <span>{article.date}</span>}
+                    <span>{readingStats.wordCount} words</span>
+                    <span>Reader friendly</span>
+                  </div>
                 </div>
               </div>
 
-              <ul>
-                {keyTakeaways.map((takeaway, index) => (
-                  <li key={index}>{takeaway}</li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {headings.length > 0 && (
-            <aside className="article-toc">
-              <p>In this article</p>
-
-              <div>
-                {headings.map((heading, index) => (
-                  <a key={index} href={`#section-${index}`}>
-                    {heading.text}
-                  </a>
-                ))}
-              </div>
-            </aside>
-          )}
-
-          <div
-            className="article-detail-content"
-            style={{ "--reader-font-size": `${fontSize}px` }}
-          >
-            {contentBlocks.map((block, index) => {
-              if (block.type === "heading") {
-                const headingIndex = contentBlocks
-                  .slice(0, index + 1)
-                  .filter((item) => item.type === "heading").length - 1;
-
-                return (
-                  <h2 key={index} id={`section-${headingIndex}`}>
-                    {block.text}
-                  </h2>
-                );
-              }
-
-              if (block.type === "quote") {
-                return <blockquote key={index}>{block.text}</blockquote>;
-              }
-
-              if (block.type === "image") {
-                return (
-                  <figure key={index}>
-                    <img src={block.src} alt={block.alt || "Article image"} />
-                    {block.caption && <figcaption>{block.caption}</figcaption>}
-                  </figure>
-                );
-              }
-
-              if (block.type === "code") {
-                return (
-                  <pre key={index}>
-                    <code>{block.code}</code>
-                  </pre>
-                );
-              }
-
-              if (block.type === "list" && Array.isArray(block.items)) {
-                return (
-                  <ul key={index} className="article-custom-list">
-                    {block.items.map((item, itemIndex) => (
-                      <li key={itemIndex}>{item}</li>
-                    ))}
-                  </ul>
-                );
-              }
-
-              return <p key={index}>{block.text}</p>;
-            })}
-          </div>
-
-          {articleImages.length > 1 && (
-            <section className="article-image-gallery">
-              <h2>Article gallery</h2>
-
-              <div>
-                {articleImages.slice(1).map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`${article.title} gallery ${index + 1}`}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-
-          <section className="article-reactions">
-            <p>How was this article?</p>
-
-            <div>
-              {["Helpful 👍", "Inspiring 💡", "Easy to read ✅"].map(
-                (reaction) => (
-                  <button
-                    key={reaction}
-                    type="button"
-                    className={selectedReaction === reaction ? "active" : ""}
-                    onClick={() => handleReaction(reaction)}
-                  >
-                    {reaction}
-                  </button>
-                )
+              {articleSummary && (
+                <p className="article-detail-summary">{articleSummary}</p>
               )}
-            </div>
+            </header>
 
-            {selectedReaction && (
-              <span className="reaction-thank-you">
-                Thanks for your feedback!
-              </span>
-            )}
-          </section>
+            <section className="reader-tools">
+              <div className="reader-tool-group">
+                <span>Text size</span>
 
-          <div className="article-actions">
-            <button type="button" onClick={copyArticleLink}>
-              Copy article link
-            </button>
+                <button type="button" onClick={decreaseFontSize}>
+                  A-
+                </button>
 
-            <Link to="/articles">Read more articles</Link>
-          </div>
-        </article>
+                <button type="button" onClick={resetFontSize}>
+                  Reset
+                </button>
 
-        {relatedArticles.length > 0 && (
-          <section className="related-articles-section">
-            <div className="related-articles-header">
-              <p>Keep reading</p>
-              <h2>Related articles</h2>
-            </div>
+                <button type="button" onClick={increaseFontSize}>
+                  A+
+                </button>
+              </div>
 
-            <div className="related-articles-grid">
-              {relatedArticles.map((item) => (
-                <Link
-                  key={item.id}
-                  to={`/articles/${item.slug || item.id}`}
-                  className="related-article-card"
-                >
-                  {item.image && <img src={item.image} alt={item.title} />}
+              <div className="reader-tool-group">
+                {!isSpeaking ? (
+                  <button type="button" onClick={listenToArticle}>
+                    🔊 Listen
+                  </button>
+                ) : (
+                  <button type="button" onClick={stopListening}>
+                    ⏹ Stop
+                  </button>
+                )}
+
+                <button type="button" onClick={copyArticleLink}>
+                  🔗 Copy link
+                </button>
+              </div>
+            </section>
+
+            {keyTakeaways.length > 0 && (
+              <section className="key-takeaways">
+                <div className="key-takeaways-heading">
+                  <span>✨</span>
 
                   <div>
-                    <span>{item.category || "General"}</span>
-                    <h3>{item.title}</h3>
-
-                    {(item.summary || item.text) && (
-                      <p>{item.summary || item.text}</p>
-                    )}
+                    <p>Key takeaways</p>
+                    <small>Quick points before reading the full article.</small>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+                </div>
 
-      {scrollProgress > 45 && (
-        <button type="button" className="back-to-top-btn" onClick={scrollToTop}>
-          ↑ Top
-        </button>
-      )}
-    </section>
+                <ul>
+                  {keyTakeaways.map((takeaway, index) => (
+                    <li key={index}>{takeaway}</li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {headings.length > 0 && (
+              <aside className="article-toc">
+                <p>In this article</p>
+
+                <div>
+                  {headings.map((heading, index) => (
+                    <a key={index} href={`#section-${index}`}>
+                      {heading.text}
+                    </a>
+                  ))}
+                </div>
+              </aside>
+            )}
+
+            <div
+              className="article-detail-content"
+              style={{ "--reader-font-size": `${fontSize}px` }}
+            >
+              {contentBlocks.map((block, index) => {
+                if (block.type === "heading") {
+                  const headingIndex =
+                    contentBlocks
+                      .slice(0, index + 1)
+                      .filter((item) => item.type === "heading").length - 1;
+
+                  return (
+                    <h2 key={index} id={`section-${headingIndex}`}>
+                      {block.text}
+                    </h2>
+                  );
+                }
+
+                if (block.type === "quote") {
+                  return <blockquote key={index}>{block.text}</blockquote>;
+                }
+
+                if (block.type === "image") {
+                  return (
+                    <figure key={index}>
+                      <img src={block.src} alt={block.alt || "Article image"} />
+                      {block.caption && (
+                        <figcaption>{block.caption}</figcaption>
+                      )}
+                    </figure>
+                  );
+                }
+
+                if (block.type === "code") {
+                  return (
+                    <pre key={index}>
+                      <code>{block.code}</code>
+                    </pre>
+                  );
+                }
+
+                if (block.type === "list" && Array.isArray(block.items)) {
+                  return (
+                    <ul key={index} className="article-custom-list">
+                      {block.items.map((item, itemIndex) => (
+                        <li key={itemIndex}>{item}</li>
+                      ))}
+                    </ul>
+                  );
+                }
+
+                return <p key={index}>{block.text}</p>;
+              })}
+            </div>
+
+            {articleImages.length > 1 && (
+              <section className="article-image-gallery">
+                <h2>Article gallery</h2>
+
+                <div>
+                  {articleImages.slice(1).map((image, index) => (
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`${article.title} gallery ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <section className="article-reactions">
+              <p>How was this article?</p>
+
+              <div>
+                {["Helpful 👍", "Inspiring 💡", "Easy to read ✅"].map(
+                  (reaction) => (
+                    <button
+                      key={reaction}
+                      type="button"
+                      className={selectedReaction === reaction ? "active" : ""}
+                      onClick={() => handleReaction(reaction)}
+                    >
+                      {reaction}
+                    </button>
+                  )
+                )}
+              </div>
+
+              {selectedReaction && (
+                <span className="reaction-thank-you">
+                  Thanks for your feedback!
+                </span>
+              )}
+            </section>
+
+            <div className="article-actions">
+              <button type="button" onClick={copyArticleLink}>
+                Copy article link
+              </button>
+
+              <Link to="/articles">Read more articles</Link>
+            </div>
+          </article>
+
+          {relatedArticles.length > 0 && (
+            <section className="related-articles-section">
+              <div className="related-articles-header">
+                <p>Keep reading</p>
+                <h2>Related articles</h2>
+              </div>
+
+              <div className="related-articles-grid">
+                {relatedArticles.map((item) => (
+                  <Link
+                    key={item.id}
+                    to={`/articles/${item.slug || item.id}`}
+                    className="related-article-card"
+                  >
+                    {item.image && <img src={item.image} alt={item.title} />}
+
+                    <div>
+                      <span>{item.category || "General"}</span>
+                      <h3>{item.title}</h3>
+
+                      {(item.summary || item.text) && (
+                        <p>{item.summary || item.text}</p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          )}
+        </div>
+
+        {scrollProgress > 45 && (
+          <button type="button" className="back-to-top-btn" onClick={scrollToTop}>
+            ↑ Top
+          </button>
+        )}
+      </section>
+    </>
   );
 }
 
