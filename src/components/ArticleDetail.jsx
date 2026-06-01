@@ -11,7 +11,7 @@ function ArticleDetail() {
   const [allArticles, setAllArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [fontSize, setFontSize] = useState(18.5);
+  const [fontSize, setFontSize] = useState(18);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [selectedReaction, setSelectedReaction] = useState("");
 
@@ -69,7 +69,7 @@ function ArticleDetail() {
   }, []);
 
   const contentBlocks = useMemo(() => {
-    if (!article?.content) return [];
+    if (!Array.isArray(article?.content)) return [];
 
     return article.content.map((item) => {
       if (typeof item === "string") {
@@ -83,12 +83,30 @@ function ArticleDetail() {
     });
   }, [article]);
 
+  const articleImages = useMemo(() => {
+    if (Array.isArray(article?.images) && article.images.length > 0) {
+      return article.images.filter(Boolean);
+    }
+
+    if (article?.image) {
+      return [article.image];
+    }
+
+    return [];
+  }, [article]);
+
   const plainArticleText = useMemo(() => {
-    return [
-      article?.title,
-      article?.summary || article?.text,
-      ...contentBlocks.map((block) => block.text || block.code || ""),
-    ]
+    const blockText = contentBlocks
+      .map((block) => {
+        if (block.type === "list" && Array.isArray(block.items)) {
+          return block.items.join(". ");
+        }
+
+        return block.text || block.code || "";
+      })
+      .filter(Boolean);
+
+    return [article?.title, article?.summary || article?.text, ...blockText]
       .filter(Boolean)
       .join(". ");
   }, [article, contentBlocks]);
@@ -119,7 +137,7 @@ function ArticleDetail() {
 
     return paragraphs.slice(0, 3).map((paragraph) => {
       const sentence = paragraph.split(".")[0];
-      return sentence.length > 125 ? `${sentence.slice(0, 125)}...` : sentence;
+      return sentence.length > 120 ? `${sentence.slice(0, 120)}...` : sentence;
     });
   }, [article, contentBlocks]);
 
@@ -144,15 +162,15 @@ function ArticleDetail() {
   }, [allArticles, article]);
 
   const increaseFontSize = () => {
-    setFontSize((current) => Math.min(current + 1, 23));
+    setFontSize((current) => Math.min(current + 1, 22));
   };
 
   const decreaseFontSize = () => {
-    setFontSize((current) => Math.max(current - 1, 15.5));
+    setFontSize((current) => Math.max(current - 1, 16));
   };
 
   const resetFontSize = () => {
-    setFontSize(18.5);
+    setFontSize(18);
   };
 
   const listenToArticle = () => {
@@ -202,8 +220,8 @@ function ArticleDetail() {
 
   if (loading) {
     return (
-      <section className="all-articles-page">
-        <div className="all-articles-container">
+      <section className="article-detail-shell">
+        <div className="article-detail-container">
           <div className="article-loading-card">
             <span className="article-loader"></span>
             <p>Loading article...</p>
@@ -219,9 +237,10 @@ function ArticleDetail() {
 
   const articleSummary = article.summary || article.text;
   const articleAuthor = article.author || "Samir Simkhada";
+  const mainImage = articleImages[0];
 
   return (
-    <section className="all-articles-page">
+    <section className="article-detail-shell">
       <div className="reading-progress">
         <div
           className="reading-progress-fill"
@@ -229,23 +248,23 @@ function ArticleDetail() {
         />
       </div>
 
-      <div className="all-articles-container">
-        <Link to="/articles" className="back-home-articles">
+      <div className="article-detail-container">
+        <Link to="/articles" className="article-back-link">
           ← Back to Articles
         </Link>
 
-        <article className="article-detail-page">
-          {article.image && (
+        <article className="article-detail-card">
+          {mainImage && (
             <div className="article-hero-image-wrap">
-              <img src={article.image} alt={article.title} />
+              <img src={mainImage} alt={article.title} />
             </div>
           )}
 
           <header className="article-header">
             <div className="article-topline">
-              {article.category && (
-                <p className="articles-badge">{article.category}</p>
-              )}
+              <span className="article-category">
+                {article.category || "General"}
+              </span>
 
               <span className="article-read-pill">
                 {readingStats.readingTime} min read
@@ -313,9 +332,10 @@ function ArticleDetail() {
             <section className="key-takeaways">
               <div className="key-takeaways-heading">
                 <span>✨</span>
+
                 <div>
-                  <p className="key-takeaways-title">Key takeaways</p>
-                  <small>Quick points before you read the full article.</small>
+                  <p>Key takeaways</p>
+                  <small>Quick points before reading the full article.</small>
                 </div>
               </div>
 
@@ -393,6 +413,22 @@ function ArticleDetail() {
             })}
           </div>
 
+          {articleImages.length > 1 && (
+            <section className="article-image-gallery">
+              <h2>Article gallery</h2>
+
+              <div>
+                {articleImages.slice(1).map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`${article.title} gallery ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           <section className="article-reactions">
             <p>How was this article?</p>
 
@@ -444,8 +480,9 @@ function ArticleDetail() {
                   {item.image && <img src={item.image} alt={item.title} />}
 
                   <div>
-                    {item.category && <span>{item.category}</span>}
+                    <span>{item.category || "General"}</span>
                     <h3>{item.title}</h3>
+
                     {(item.summary || item.text) && (
                       <p>{item.summary || item.text}</p>
                     )}
