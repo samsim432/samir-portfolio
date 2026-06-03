@@ -3,36 +3,31 @@ import "./PrivacyPolicy.css";
 function PrivacyPolicy() {
   return (
     <section className="privacy-page">
-
       <div className="privacy-hero">
         <span className="privacy-badge">Privacy & Data Protection</span>
 
         <h1>Privacy Policy</h1>
 
         <p>
-          Your privacy matters. This page explains how information is collected,
-          used, and protected while using the Samir Simkhada website and its
-          educational content.
+          At Samir Simkhada, we respect your privacy and are committed to
+          protecting any information you share while using our website.
         </p>
 
-        <small>Last updated: May 18, 2026</small>
+        <small>Last Updated: June 2026</small>
       </div>
 
       <div className="privacy-container">
-
         <div className="privacy-card">
           <h2>Introduction</h2>
 
           <p>
-            This website provides educational articles, science storytelling,
-            What If scenarios, and informational content related to science,
-            technology, history, space, artificial intelligence, and future
-            ideas.
+            Samir Simkhada is an educational website that publishes articles
+            about science, technology, artificial intelligence, space, history,
+            future concepts, and educational What If scenarios.
           </p>
 
           <p>
-            By using this website, you agree to the terms outlined in this
-            Privacy Policy.
+            By using this website, you agree to this Privacy Policy.
           </p>
         </div>
 
@@ -40,14 +35,19 @@ function PrivacyPolicy() {
           <h2>Information We Collect</h2>
 
           <p>
-            When visitors contact us through forms or email, basic information
-            such as name, email address, and message details may be collected.
+            We may collect information you voluntarily provide when contacting
+            us through forms, email, or other communication methods.
           </p>
 
-          <p>
-            This information is used only for communication, responding to
-            inquiries, and improving the website experience.
-          </p>
+          <p>This information may include:</p>
+
+          <ul>
+            <li>Name</li>
+            <li>Email address</li>
+            <li>Messages or inquiries you submit</li>
+          </ul>
+
+          <p>We do not sell, rent, or trade your personal information.</p>
         </div>
 
         <div className="privacy-card">
@@ -55,13 +55,12 @@ function PrivacyPolicy() {
 
           <p>
             This website may use cookies and similar technologies to improve
-            user experience, remember preferences, analyze traffic, and support
-            advertising services.
+            user experience, analyze website performance, remember preferences,
+            and support advertising services.
           </p>
 
           <p>
-            Cookies help understand how visitors interact with the website and
-            allow certain website features to function properly.
+            You can disable cookies through your browser settings.
           </p>
         </div>
 
@@ -69,14 +68,28 @@ function PrivacyPolicy() {
           <h2>Google AdSense & Advertising</h2>
 
           <p>
-            Third-party vendors, including Google, may use cookies to serve ads
-            based on previous visits to this website or other websites.
+            We may display advertisements through Google AdSense and other
+            advertising partners.
           </p>
 
           <p>
-            Google’s advertising cookies help display more relevant ads to
-            users. Visitors can learn more about personalized advertising by
-            visiting Google Ads Settings.
+            Third-party vendors, including Google, may use cookies to serve ads
+            based on your previous visits to this website or other websites.
+          </p>
+
+          <p>
+            Google&apos;s advertising cookies help show more relevant ads to
+            visitors.
+          </p>
+        </div>
+
+        <div className="privacy-card">
+          <h2>Personalized Advertising Opt-Out</h2>
+
+          <p>
+            Users can manage or disable personalized advertising through Google
+            Ads Settings. You can also control cookies through your browser
+            settings.
           </p>
         </div>
 
@@ -84,41 +97,94 @@ function PrivacyPolicy() {
           <h2>Analytics</h2>
 
           <p>
-            Analytics tools may be used to understand website traffic, visitor
-            behavior, and content performance. This information helps improve
-            articles, educational resources, and overall website quality.
+            We may use analytics tools to understand website traffic, visitor
+            behavior, popular content, and overall site performance.
+          </p>
+
+          <p>
+            This information helps us improve articles, educational content,
+            and user experience.
           </p>
         </div>
 
         <div className="privacy-card">
-          <h2>External Links</h2>
+          <h2>Third-Party Links</h2>
 
           <p>
-            Some pages may contain links to external websites or social media
-            platforms. This website is not responsible for the privacy practices
-            or content of third-party websites.
+            Our website may contain links to external websites, social media
+            platforms, or third-party services.
+          </p>
+
+          <p>
+            We are not responsible for the privacy practices, content, or
+            policies of external websites.
           </p>
         </div>
 
         <div className="privacy-card">
-          <h2>Data Protection</h2>
+          <h2>Data Security</h2>
 
           <p>
-            Reasonable steps are taken to protect visitor information and
-            maintain website security. However, no internet transmission or
-            storage system can be guaranteed to be 100% secure.
+            We take reasonable steps to protect visitor information from
+            unauthorized access, misuse, or disclosure.
+          </p>
+
+          <p>
+            However, no method of internet transmission or electronic storage is
+            completely secure, and absolute security cannot be guaranteed.
           </p>
         </div>
 
         <div className="privacy-card">
-          <h2>Contact</h2>
+          <h2>Children&apos;s Privacy</h2>
 
           <p>
-            If you have questions regarding this Privacy Policy or your data,
-            please contact through the Contact page available on this website.
+            This website is intended for general educational purposes and
+            general audiences.
+          </p>
+
+          <p>
+            We do not knowingly collect personal information from children. If
+            you believe a child has provided personal information, please
+            contact us so appropriate action can be taken.
           </p>
         </div>
 
+        <div className="privacy-card">
+          <h2>Your Rights</h2>
+
+          <p>
+            You may request information about the personal data we hold, request
+            corrections, or request deletion of information you have voluntarily
+            provided.
+          </p>
+        </div>
+
+        <div className="privacy-card">
+          <h2>Changes to This Privacy Policy</h2>
+
+          <p>
+            We may update this Privacy Policy from time to time to reflect
+            website changes, legal requirements, or new features.
+          </p>
+
+          <p>
+            Any updates will be posted on this page with a revised update date.
+          </p>
+        </div>
+
+        <div className="privacy-card">
+          <h2>Contact Us</h2>
+
+          <p>
+            If you have any questions about this Privacy Policy, please contact
+            us at:
+          </p>
+
+          <p>
+            <strong>Email:</strong> Wrongsamir88@gmail.com
+          </p>
+        </div>
       </div>
     </section>
   );

@@ -13,22 +13,18 @@ function SiteBot() {
         aria-label="Open Samir AI Assistant"
         type="button"
       >
-        <span>{open ? "×" : "🤖"}</span>
+        <span>{open ? "×" : "✨"}</span>
       </button>
 
       {open && (
         <div className="sitebot-box">
           <div className="sitebot-header">
             <div className="sitebot-header-left">
-              <div className="sitebot-avatar">🤖</div>
+              <div className="sitebot-avatar">✨</div>
 
               <div>
                 <strong>Samir AI</strong>
-
-                <span>
-                  <i></i>
-                  Coming Soon
-                </span>
+                <span><i></i> Coming Soon</span>
               </div>
             </div>
 
@@ -43,54 +39,34 @@ function SiteBot() {
           </div>
 
           <div className="sitebot-body">
-            <div className="sitebot-message bot">
+            <div className="sitebot-message">
               <p>
-                Hi, I’m <strong>Samir AI</strong>. Soon I’ll help visitors
-                explore articles, learn about Samir, view projects, and contact
-                easily.
+                Hi, I’m <strong>Samir AI</strong>. Soon I’ll help you explore
+                articles, projects, shop, and contact options easily.
               </p>
             </div>
 
             <div className="sitebot-suggestions">
-              <Link to="/about" onClick={() => setOpen(false)}>
-                About Samir
-              </Link>
-
-              <Link to="/articles" onClick={() => setOpen(false)}>
-                Latest Articles
-              </Link>
-
-              <Link to="/shop" onClick={() => setOpen(false)}>
-                Explore Shop
-              </Link>
-
-              <Link to="/hire" onClick={() => setOpen(false)}>
-                Hire Me
-              </Link>
+              <Link to="/about" onClick={() => setOpen(false)}>About</Link>
+              <Link to="/articles" onClick={() => setOpen(false)}>Articles</Link>
+              <Link to="/shop" onClick={() => setOpen(false)}>Shop</Link>
+              <Link to="/hire" onClick={() => setOpen(false)}>Hire Me</Link>
             </div>
 
             <div className="sitebot-info-card">
               <p className="sitebot-coming-badge">Coming Soon</p>
-
-              <h2>Smart website assistant</h2>
-
+              <h2>Smart assistant</h2>
               <p>
-                This assistant will answer questions, recommend content, guide
-                visitors, and make the website easier to use.
+                Soon this assistant will guide visitors and recommend helpful
+                content from the website.
               </p>
-            </div>
-
-            <div className="sitebot-typing">
-              <span></span>
-              <span></span>
-              <span></span>
             </div>
           </div>
 
           <div className="sitebot-footer">
             <input
               type="text"
-              placeholder="Ask me anything... coming soon"
+              placeholder="Ask me anything..."
               disabled
             />
 
