@@ -17,6 +17,7 @@ import Hire from "./components/Hire";
 import Admin from "./components/Admin";
 import PrivacyPolicy from "./components/PrivacyPolicy";
 import ShopPage from "./components/ShopPage";
+import Quiz from "./components/Quiz";
 
 import "./App.css";
 
@@ -109,6 +110,14 @@ function App() {
           </PageLayout>
         }
       />
+      <Route
+  path="/quiz"
+  element={
+    <PageLayout>
+      <Quiz />
+    </PageLayout>
+  }
+/>
 
       <Route
         path="/privacy-policy"

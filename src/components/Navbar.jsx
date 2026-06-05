@@ -12,6 +12,7 @@ function Navbar() {
     ["shop", "Shop", "/shop"],
     ["about", "About", "/about"],
     ["contact", "Contact", "/#contact"],
+    ["quiz", "Quiz", "/quiz"],
   ];
 
   useEffect(() => {
