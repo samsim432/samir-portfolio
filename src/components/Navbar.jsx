@@ -47,7 +47,7 @@ function Navbar() {
           </span>
 
           <img
-            src="/profile.jpg"
+            src="/profile.webp"
             alt="Samir Simkhada"
             className="logo-profile"
           />

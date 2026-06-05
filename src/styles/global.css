@@ -3,12 +3,12 @@
   --bg: #f8fafc;
   --text: #0f172a;
   --border: rgba(2, 132, 199, 0.15);
-  --shadow: 0 10px 30px rgba(0,0,0,0.08);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
 }
 
 body {
   margin: 0;
-  font-family: system-ui;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -28,5 +28,6 @@ button {
 /* IMAGES CLEAN */
 img {
   max-width: 100%;
+  height: auto;
   display: block;
 }
