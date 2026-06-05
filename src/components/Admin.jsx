@@ -10,10 +10,11 @@ import {
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
-import { db } from "../firebase";
+import { auth, db } from "../firebase";
+import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import "./Admin.css";
 
-const ADMIN_PASSWORD = "Samir@321";
+
 
 const CATEGORY_OPTIONS = [
   "AI",
@@ -109,9 +110,9 @@ function stringifyContent(content) {
 }
 
 function Admin() {
-  const [isLoggedIn, setIsLoggedIn] = useState(
-    localStorage.getItem("samir-admin-login") === "true"
-  );
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [articles, setArticles] = useState([]);
   const [form, setForm] = useState(emptyForm);
@@ -119,6 +120,18 @@ function Admin() {
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user?.email === "wrongsamir88@gmail.com") {
+        setIsLoggedIn(true);
+      } else {
+        setIsLoggedIn(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (!isLoggedIn) return;
@@ -130,12 +143,13 @@ function Admin() {
         id: item.id,
         ...item.data(),
       }));
-
-      setArticles(firebaseArticles);
+           setArticles(firebaseArticles);
     });
 
     return () => unsubscribe();
   }, [isLoggedIn]);
+
+
 
   const categories = useMemo(() => {
     return ["All", ...CATEGORY_OPTIONS];
@@ -158,22 +172,26 @@ function Admin() {
 
   const latestArticle = articles[0];
 
-  const handleLogin = (event) => {
-    event.preventDefault();
+ const handleLogin = async (event) => {
+  event.preventDefault();
 
-    if (password === ADMIN_PASSWORD) {
-      localStorage.setItem("samir-admin-login", "true");
-      setIsLoggedIn(true);
-      setPassword("");
-    } else {
-      alert("Wrong password");
-    }
-  };
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
 
-  const handleLogout = () => {
-    localStorage.removeItem("samir-admin-login");
-    setIsLoggedIn(false);
-  };
+    setPassword("");
+  } catch (error) {
+    alert("Login failed");
+    console.error(error);
+  }
+};
+
+const handleLogout = async () => {
+  await signOut(auth);
+};
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -382,15 +400,23 @@ function Admin() {
           <div className="admin-login-icon">🔐</div>
 
           <h1>Admin Login</h1>
-          <p>Enter your admin password to manage articles.</p>
+          <p>Sign in with your Firebase admin account.</p>
 
           <input
-            type="password"
-            placeholder="Admin password"
-            value={password}
-            required
-            onChange={(event) => setPassword(event.target.value)}
-          />
+  type="email"
+  placeholder="Email"
+  value={email}
+  required
+  onChange={(event) => setEmail(event.target.value)}
+/>
+
+<input
+  type="password"
+  placeholder="Password"
+  value={password}
+  required
+  onChange={(event) => setPassword(event.target.value)}
+/>
 
           <button type="submit">Login</button>
         </form>
