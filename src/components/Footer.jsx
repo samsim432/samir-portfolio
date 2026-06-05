@@ -10,7 +10,7 @@ function Footer() {
 
           {/* LOGO */}
           <a href="/" className="footer-logo">
-            <img src="/profile.jpg" alt="Samir Simkhada" />
+            <img src="/profile.webp" alt="Samir Simkhada" />
 
             <div>
               <h3>Samir Simkhada</h3>
