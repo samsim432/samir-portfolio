@@ -6,6 +6,7 @@ import {
   addDoc,
   getDocs,
   query,
+  where,
   orderBy,
   limit,
   serverTimestamp,
@@ -47,6 +48,12 @@ function Quiz() {
   const [userName, setUserName] = useState("");
   const [leaderboard, setLeaderboard] = useState([]);
   const [saving, setSaving] = useState(false);
+  const [userRank, setUserRank] = useState(null);
+  const [stats, setStats] = useState({
+    totalAttempts: 0,
+    averageScore: 0,
+    highestScore: 0,
+  });
 
   const questions = useMemo(() => {
     if (!category || !paper) return [];
@@ -56,6 +63,30 @@ function Quiz() {
   const correctCount = answers.filter((a) => a.isCorrect).length;
   const incorrectCount = answers.length - correctCount;
   const percentage = Math.round((correctCount / 30) * 100);
+
+  const fireConfetti = () => {
+    if (percentage < 80) return;
+
+    for (let i = 0; i < 80; i++) {
+      const confetti = document.createElement("span");
+      confetti.className = "confetti";
+      confetti.style.left = `${Math.random() * 100}%`;
+      confetti.style.animationDelay = `${Math.random() * 0.8}s`;
+      confetti.style.backgroundColor = [
+        "#2563eb",
+        "#0ea5e9",
+        "#22c55e",
+        "#facc15",
+        "#f97316",
+      ][Math.floor(Math.random() * 5)];
+
+      document.body.appendChild(confetti);
+
+      setTimeout(() => {
+        confetti.remove();
+      }, 3000);
+    }
+  };
 
   const nextQuestion = (answerValue = "") => {
     const q = questions[current];
@@ -111,15 +142,17 @@ function Quiz() {
     setSelected("");
     setTimeLeft(60);
     setUserName("");
+    setUserRank(null);
     setScreen("quiz");
   };
 
   const loadLeaderboard = async () => {
     const q = query(
-  collection(db, "quizScores"),
-  orderBy("score", "desc"),
-  limit(10)
-);
+      collection(db, "quizScores"),
+      where("category", "==", category),
+      orderBy("score", "desc"),
+      limit(10)
+    );
 
     const snap = await getDocs(q);
 
@@ -131,6 +164,37 @@ function Quiz() {
     setLeaderboard(data);
   };
 
+  const loadStats = async () => {
+    const q = query(
+      collection(db, "quizScores"),
+      where("category", "==", category)
+    );
+
+    const snap = await getDocs(q);
+    const data = snap.docs.map((doc) => doc.data());
+
+    if (data.length === 0) {
+      setStats({
+        totalAttempts: 0,
+        averageScore: 0,
+        highestScore: 0,
+      });
+      return;
+    }
+
+    const totalAttempts = data.length;
+    const highestScore = Math.max(...data.map((item) => item.score));
+    const averageScore = Math.round(
+      data.reduce((sum, item) => sum + item.score, 0) / totalAttempts
+    );
+
+    setStats({
+      totalAttempts,
+      averageScore,
+      highestScore,
+    });
+  };
+
   const saveScore = async () => {
     if (!userName.trim()) {
       alert("Please enter your name");
@@ -140,8 +204,25 @@ function Quiz() {
     try {
       setSaving(true);
 
+      const sameNameQuery = query(
+        collection(db, "quizScores"),
+        where("category", "==", category),
+        where("nameLower", "==", userName.trim().toLowerCase())
+      );
+
+      const sameNameSnap = await getDocs(sameNameQuery);
+
+      if (!sameNameSnap.empty) {
+        alert(
+          "This name already exists in this category leaderboard. Please use another name."
+        );
+        setSaving(false);
+        return;
+      }
+
       await addDoc(collection(db, "quizScores"), {
         name: userName.trim(),
+        nameLower: userName.trim().toLowerCase(),
         category,
         paper,
         score: correctCount,
@@ -152,11 +233,33 @@ function Quiz() {
         date: new Date().toLocaleDateString(),
       });
 
+      const rankQuery = query(
+        collection(db, "quizScores"),
+        where("category", "==", category),
+        orderBy("score", "desc")
+      );
+
+      const rankSnap = await getDocs(rankQuery);
+      const allScores = rankSnap.docs.map((doc) => doc.data());
+
+      const rank =
+        allScores.findIndex(
+          (item) =>
+            item.nameLower === userName.trim().toLowerCase() &&
+            item.score === correctCount
+        ) + 1;
+
+      setUserRank(rank);
+
       await loadLeaderboard();
+      await loadStats();
+
+      fireConfetti();
+
       setScreen("leaderboard");
     } catch (error) {
       console.error(error);
-      alert("Score not saved. Please check Firebase rules.");
+      alert(error.message);
     } finally {
       setSaving(false);
     }
@@ -169,6 +272,7 @@ function Quiz() {
     setAnswers([]);
     setTimeLeft(60);
     setUserName("");
+    setUserRank(null);
   };
 
   return (
@@ -185,6 +289,7 @@ function Quiz() {
                 className="category-card"
                 onClick={() => {
                   setCategory(cat.id);
+                  setUserRank(null);
                   setScreen("papers");
                 }}
               >
@@ -296,7 +401,39 @@ function Quiz() {
 
       {screen === "leaderboard" && (
         <div className="leaderboard-card">
-          <h1>Leaderboard</h1>
+          <h1>
+            {category === "space"
+              ? "🚀 Space"
+              : category === "physics"
+              ? "⚛️ Physics"
+              : category === "ai"
+              ? "🤖 AI & Technology"
+              : "🌍 General Knowledge"}{" "}
+            Leaderboard
+          </h1>
+
+          {userRank && (
+            <div className="rank-box">
+              🎉 Your Rank: <strong>#{userRank}</strong>
+            </div>
+          )}
+
+          <div className="stats-grid">
+            <div>
+              <span>Total Attempts</span>
+              <strong>{stats.totalAttempts}</strong>
+            </div>
+
+            <div>
+              <span>Average Score</span>
+              <strong>{stats.averageScore}/30</strong>
+            </div>
+
+            <div>
+              <span>Highest Score</span>
+              <strong>{stats.highestScore}/30</strong>
+            </div>
+          </div>
 
           <table>
             <thead>
@@ -312,7 +449,15 @@ function Quiz() {
             <tbody>
               {leaderboard.map((item, index) => (
                 <tr key={item.id}>
-                  <td>{index + 1}</td>
+                  <td>
+                    {index === 0
+                      ? "🥇"
+                      : index === 1
+                      ? "🥈"
+                      : index === 2
+                      ? "🥉"
+                      : index + 1}
+                  </td>
                   <td>{item.name}</td>
                   <td>{item.score}/30</td>
                   <td>{item.percentage}%</td>
