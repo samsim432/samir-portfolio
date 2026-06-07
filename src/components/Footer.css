@@ -104,6 +104,10 @@
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(56, 189, 248, 0.22);
 }
+.footer-socials a svg {
+  font-size: 22px;
+  color: white;
+}
 
 .footer-bottom {
   padding-top: 20px;
