@@ -54,7 +54,7 @@ function SiteBot() {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:3001/api/chat", {
+      const res = await fetch("https://samir-portfolio-production-90a8.up.railway.app/api/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
