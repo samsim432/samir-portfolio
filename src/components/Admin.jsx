@@ -60,18 +60,24 @@ function parseContent(contentText) {
     .map((line) => line.trim())
     .filter(Boolean)
     .map((line) => {
+      if (line.startsWith("### ")) {
+        return { type: "subheading", text: line.replace("### ", "") };
+      }
+
       if (line.startsWith("## ")) {
-        return {
-          type: "heading",
-          text: line.replace("## ", ""),
-        };
+        return { type: "heading", text: line.replace("## ", "") };
       }
 
       if (line.startsWith("> ")) {
-        return {
-          type: "quote",
-          text: line.replace("> ", ""),
-        };
+        return { type: "quote", text: line.replace("> ", "") };
+      }
+
+      if (line.startsWith("FACT:")) {
+        return { type: "fact", text: line.replace("FACT:", "").trim() };
+      }
+
+      if (line.startsWith("TIP:")) {
+        return { type: "tip", text: line.replace("TIP:", "").trim() };
       }
 
       if (line.startsWith("- ")) {
@@ -84,10 +90,7 @@ function parseContent(contentText) {
         };
       }
 
-      return {
-        type: "paragraph",
-        text: line,
-      };
+      return { type: "paragraph", text: line };
     });
 }
 
@@ -99,7 +102,15 @@ function stringifyContent(content) {
       if (typeof block === "string") return block;
 
       if (block.type === "heading") return `## ${block.text || ""}`;
+
+      if (block.type === "subheading") return `### ${block.text || ""}`;
+
       if (block.type === "quote") return `> ${block.text || ""}`;
+
+      if (block.type === "fact") return `FACT: ${block.text || ""}`;
+
+      if (block.type === "tip") return `TIP: ${block.text || ""}`;
+
       if (block.type === "list" && Array.isArray(block.items)) {
         return block.items.map((item) => `- ${item}`).join(" ");
       }
@@ -636,10 +647,20 @@ const handleLogout = async () => {
               rows="16"
               placeholder={`Write your article here.
 
-Use:
-## Heading
-Normal paragraph text
-> Quote text
+Use this format:
+
+## Big Heading
+
+### Small Heading
+
+Normal paragraph text here.
+
+FACT: Write important fact here.
+
+TIP: Write simple tip here.
+
+> Quote text here.
+
 - List item one - List item two - List item three`}
               value={form.content}
               required

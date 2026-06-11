@@ -314,10 +314,33 @@ function ArticleDetail() {
           />
         </div>
 
-        <div className="article-detail-container">
-          <Link to="/articles" className="article-back-link">
-            ← Back to Articles
-          </Link>
+                return (
+                  <h2 key={index} id={`section-${headingIndex}`}>
+                    {block.text}
+                  </h2>
+                );
+              }
+              if (block.type === "subheading") {
+  return <h3 key={index}>{block.text}</h3>;
+}
+
+if (block.type === "fact") {
+  return (
+    <div key={index} className="article-info-box fact-box">
+      <strong>🧠 Key Fact</strong>
+      <p>{block.text}</p>
+    </div>
+  );
+}
+
+if (block.type === "tip") {
+  return (
+    <div key={index} className="article-info-box tip-box">
+      <strong>💡 Simple Tip</strong>
+      <p>{block.text}</p>
+    </div>
+  );
+}
 
           <article className="article-detail-card">
             {mainImage && (
