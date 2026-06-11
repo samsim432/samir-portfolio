@@ -251,8 +251,7 @@ function ArticleDetail() {
       ? `${articleSummary.slice(0, 152)}...`
       : articleSummary;
 
-  const seoImage =
-    mainImage || "https://samirsimkhada.com.np/og-image.png";
+  const seoImage = mainImage || "https://samirsimkhada.com.np/og-image.png";
 
   const canonicalUrl = `https://samirsimkhada.com.np/articles/${
     article.slug || article.id
@@ -284,9 +283,7 @@ function ArticleDetail() {
     <>
       <Helmet>
         <title>{seoTitle}</title>
-
         <meta name="description" content={seoDescription} />
-
         <link rel="canonical" href={canonicalUrl} />
 
         <meta property="og:type" content="article" />
@@ -314,33 +311,10 @@ function ArticleDetail() {
           />
         </div>
 
-                return (
-                  <h2 key={index} id={`section-${headingIndex}`}>
-                    {block.text}
-                  </h2>
-                );
-              }
-              if (block.type === "subheading") {
-  return <h3 key={index}>{block.text}</h3>;
-}
-
-if (block.type === "fact") {
-  return (
-    <div key={index} className="article-info-box fact-box">
-      <strong>🧠 Key Fact</strong>
-      <p>{block.text}</p>
-    </div>
-  );
-}
-
-if (block.type === "tip") {
-  return (
-    <div key={index} className="article-info-box tip-box">
-      <strong>💡 Simple Tip</strong>
-      <p>{block.text}</p>
-    </div>
-  );
-}
+        <div className="article-detail-container">
+          <Link to="/articles" className="article-back-link">
+            ← Back to Articles
+          </Link>
 
           <article className="article-detail-card">
             {mainImage && (
@@ -456,15 +430,36 @@ if (block.type === "tip") {
             >
               {contentBlocks.map((block, index) => {
                 if (block.type === "heading") {
-                  const headingIndex =
-                    contentBlocks
-                      .slice(0, index + 1)
-                      .filter((item) => item.type === "heading").length - 1;
+                  const headingIndex = contentBlocks
+                    .slice(0, index + 1)
+                    .filter((item) => item.type === "heading").length - 1;
 
                   return (
                     <h2 key={index} id={`section-${headingIndex}`}>
                       {block.text}
                     </h2>
+                  );
+                }
+
+                if (block.type === "subheading") {
+                  return <h3 key={index}>{block.text}</h3>;
+                }
+
+                if (block.type === "fact") {
+                  return (
+                    <div key={index} className="article-info-box fact-box">
+                      <strong>🧠 Key Fact</strong>
+                      <p>{block.text}</p>
+                    </div>
+                  );
+                }
+
+                if (block.type === "tip") {
+                  return (
+                    <div key={index} className="article-info-box tip-box">
+                      <strong>💡 Simple Tip</strong>
+                      <p>{block.text}</p>
+                    </div>
                   );
                 }
 
@@ -475,7 +470,10 @@ if (block.type === "tip") {
                 if (block.type === "image") {
                   return (
                     <figure key={index}>
-                      <img src={block.src} alt={block.alt || "Article image"} />
+                      <img
+                        src={block.src}
+                        alt={block.alt || "Article image"}
+                      />
                       {block.caption && (
                         <figcaption>{block.caption}</figcaption>
                       )}
