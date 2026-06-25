@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -14,7 +15,6 @@ import "./App.css";
 const SiteBot = lazy(() => import("./components/SiteBot"));
 const AllArticles = lazy(() => import("./components/AllArticles"));
 const ArticleDetail = lazy(() => import("./components/ArticleDetail"));
-const Reels = lazy(() => import("./components/Reels"));
 const About = lazy(() => import("./components/About"));
 const Hire = lazy(() => import("./components/Hire"));
 const Admin = lazy(() => import("./components/Admin"));
@@ -24,6 +24,42 @@ const Quiz = lazy(() => import("./components/Quiz"));
 
 function Loading() {
   return <div className="page-loading">Loading...</div>;
+}
+
+function SEO({
+  title = "Samir Simkhada | AI & Science",
+  description = "AI, science, space, technology, and educational articles by Samir Simkhada.",
+  noIndex = false,
+}) {
+  const location = useLocation();
+  const cleanPath =
+    location.pathname === "/" ? "" : location.pathname.replace(/\/$/, "");
+
+  const canonicalUrl = `https://samirsimkhada.com.np${cleanPath}`;
+
+  return (
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+
+      {noIndex ? (
+        <meta name="robots" content="noindex,nofollow" />
+      ) : (
+        <meta name="robots" content="index,follow" />
+      )}
+
+      <link rel="canonical" href={canonicalUrl} />
+
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:type" content="website" />
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+    </Helmet>
+  );
 }
 
 function PageLayout({ children }) {
@@ -44,6 +80,10 @@ function PageLayout({ children }) {
 function MainPage() {
   return (
     <PageLayout>
+      <SEO
+        title="Samir Simkhada | AI & Science"
+        description="Explore AI, science, space, technology, and educational articles by Samir Simkhada."
+      />
       <Home />
       <Articles />
       <Shop />
@@ -62,6 +102,10 @@ function App() {
           path="/articles"
           element={
             <PageLayout>
+              <SEO
+                title="Articles | Samir Simkhada"
+                description="Read AI, science, space, technology, and What If articles by Samir Simkhada."
+              />
               <AllArticles />
             </PageLayout>
           }
@@ -71,6 +115,10 @@ function App() {
           path="/articles/:slug"
           element={
             <PageLayout>
+              <SEO
+                title="Article | Samir Simkhada"
+                description="Read this AI, science, space, and technology article by Samir Simkhada."
+              />
               <ArticleDetail />
             </PageLayout>
           }
@@ -80,16 +128,11 @@ function App() {
           path="/shop"
           element={
             <PageLayout>
+              <SEO
+                title="Shop | Samir Simkhada"
+                description="Explore recommended digital products, tools, and resources from Samir Simkhada."
+              />
               <ShopPage />
-            </PageLayout>
-          }
-        />
-
-        <Route
-          path="/reels"
-          element={
-            <PageLayout>
-              <Reels />
             </PageLayout>
           }
         />
@@ -98,6 +141,10 @@ function App() {
           path="/about"
           element={
             <PageLayout>
+              <SEO
+                title="About | Samir Simkhada"
+                description="Learn about Samir Simkhada, his work in AI, science, technology, and educational content."
+              />
               <About />
             </PageLayout>
           }
@@ -107,16 +154,11 @@ function App() {
           path="/hire"
           element={
             <PageLayout>
+              <SEO
+                title="Hire Me | Samir Simkhada"
+                description="Hire Samir Simkhada for AI, web development, technical content, and digital projects."
+              />
               <Hire />
-            </PageLayout>
-          }
-        />
-
-        <Route
-          path="/admin"
-          element={
-            <PageLayout>
-              <Admin />
             </PageLayout>
           }
         />
@@ -125,6 +167,10 @@ function App() {
           path="/quiz"
           element={
             <PageLayout>
+              <SEO
+                title="Quiz | Samir Simkhada"
+                description="Test your knowledge with quizzes about AI, science, space, and general knowledge."
+              />
               <Quiz />
             </PageLayout>
           }
@@ -134,12 +180,27 @@ function App() {
           path="/privacy-policy"
           element={
             <PageLayout>
+              <SEO
+                title="Privacy Policy | Samir Simkhada"
+                description="Read the privacy policy for samirsimkhada.com.np."
+              />
               <PrivacyPolicy />
             </PageLayout>
           }
         />
 
+        <Route
+          path="/admin"
+          element={
+            <PageLayout>
+              <SEO title="Admin | Samir Simkhada" noIndex={true} />
+              <Admin />
+            </PageLayout>
+          }
+        />
+
         <Route path="/articles-page" element={<Navigate to="/articles" replace />} />
+        <Route path="/reels" element={<Navigate to="/" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
