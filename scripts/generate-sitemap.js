@@ -23,7 +23,7 @@ const staticPages = [
 ];
 
 function createSlug(title) {
-  return title
+  return String(title)
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^a-z0-9\s-]/g, "")
@@ -34,13 +34,24 @@ function createSlug(title) {
 async function generateSitemap() {
   try {
     const urls = [];
+    const seenUrls = new Set();
 
-    staticPages.forEach((page) => {
+    function addUrl(path, priority) {
+      const cleanPath = path === "/" ? "" : path.replace(/\/$/, "");
+      const loc = `${SITE_URL}${cleanPath}`;
+
+      if (seenUrls.has(loc)) return;
+      seenUrls.add(loc);
+
       urls.push(`
   <url>
-    <loc>${SITE_URL}${page ? `/${page}` : ""}</loc>
-    <priority>${page === "" ? "1.0" : "0.8"}</priority>
+    <loc>${loc}</loc>
+    <priority>${priority}</priority>
   </url>`);
+    }
+
+    staticPages.forEach((page) => {
+      addUrl(page ? `/${page}` : "/", page === "" ? "1.0" : "0.8");
     });
 
     const articlesSnapshot = await getDocs(collection(db, "articles"));
@@ -48,15 +59,13 @@ async function generateSitemap() {
     articlesSnapshot.forEach((doc) => {
       const article = doc.data();
 
-      if (article.title) {
-        const slug = createSlug(article.title);
+      if (!article.title) return;
 
-        urls.push(`
-  <url>
-    <loc>${SITE_URL}/articles/${slug}</loc>
-    <priority>0.9</priority>
-  </url>`);
-      }
+      const slug = createSlug(article.title);
+
+      if (!slug) return;
+
+      addUrl(`/articles/${slug}`, "0.9");
     });
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
