@@ -24,20 +24,13 @@ function Home() {
           </p>
 
           <p className="home-text">
-            I create educational articles and explanations about artificial
-            intelligence, science, space, technology, history, and future ideas.
-            My goal is to make complex topics simple, useful, and interesting
-            for students, curious readers, and knowledge lovers.
+            I create simple and educational content about artificial intelligence,
+            science, space, technology, history, and future ideas.
           </p>
 
           <p className="home-text">
-            On this website, you will find easy-to-read articles, What If
-            stories, AI explainers, science concepts, space topics, and digital
-            learning resources written in clear language.
-          </p>
-
-          <p className="home-cta-text">
-            Explore original educational content designed to make learning easier.
+            My goal is to make complex topics easy to understand for students,
+            curious readers, and knowledge lovers.
           </p>
 
           <div className="topic-chips">
@@ -50,38 +43,30 @@ function Home() {
           </div>
 
           <div className="home-buttons">
-            <Button href="#articles" variant="primary">
+            <Button href="/articles" variant="primary">
               Read Articles
             </Button>
 
-            <Button href="/about" variant="secondary">
-              About Me
+            <Button href="/hire" variant="secondary">
+              Hire Me
             </Button>
           </div>
 
           <div className="trust-box">
             <h2>Why trust this website?</h2>
             <ul>
-              <li>Original educational articles written in simple language</li>
-              <li>Topics focused on AI, science, space, and technology</li>
+              <li>Original educational articles in simple language</li>
+              <li>Focused on AI, science, space, and technology</li>
               <li>Clear explanations for students and curious readers</li>
               <li>Regularly updated with new knowledge-based content</li>
             </ul>
           </div>
 
           <div className="social-links">
-            <a href="https://www.youtube.com/@Samirsimkhada0" target="_blank" rel="noopener noreferrer">
-              YouTube
-            </a>
-            <a href="https://www.instagram.com/simkhadasamir333/?hl=en" target="_blank" rel="noopener noreferrer">
-              Instagram
-            </a>
-            <a href="https://www.facebook.com/samir.simkhada.3o" target="_blank" rel="noopener noreferrer">
-              Facebook
-            </a>
-            <a href="https://www.tiktok.com/@samir.simkhada0?_r=1&_t=ZN-96REvfztlPK" target="_blank" rel="noopener noreferrer">
-              TikTok
-            </a>
+            <a href="https://www.youtube.com/@Samirsimkhada0" target="_blank" rel="noopener noreferrer">YouTube</a>
+            <a href="https://www.instagram.com/simkhadasamir333/?hl=en" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://www.facebook.com/samir.simkhada.3o" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="https://www.tiktok.com/@samir.simkhada0?_r=1&_t=ZN-96REvfztlPK" target="_blank" rel="noopener noreferrer">TikTok</a>
           </div>
         </div>
 
@@ -109,13 +94,13 @@ function Home() {
             </div>
 
             <div className="stat-card">
-              <strong>Topics</strong>
-              <span>AI • Science • Space • Tech</span>
+              <strong>AI</strong>
+              <span>Science • Space • Tech</span>
             </div>
 
             <div className="stat-card">
-              <strong>Purpose</strong>
-              <span>Simple Learning for Everyone</span>
+              <strong>Simple</strong>
+              <span>Learning for Everyone</span>
             </div>
           </div>
         </div>
