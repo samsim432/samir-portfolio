@@ -200,8 +200,24 @@ function App() {
         />
 
         <Route path="/articles-page" element={<Navigate to="/articles" replace />} />
-        <Route path="/reels" element={<Navigate to="/" replace />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        
+        <Route
+  path="*"
+  element={
+    <PageLayout>
+      <SEO
+        title="404 - Page Not Found | Samir Simkhada"
+        description="This page does not exist on samirsimkhada.com.np."
+        noIndex={true}
+      />
+      <div style={{ padding: "120px 20px", textAlign: "center" }}>
+        <h1>404 - Page Not Found</h1>
+        <p>The page you are looking for does not exist.</p>
+        <a href="/">Go back home</a>
+      </div>
+    </PageLayout>
+  }
+/>
       </Routes>
     </Suspense>
   );

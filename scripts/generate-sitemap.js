@@ -18,7 +18,6 @@ const staticPages = [
   "articles",
   "about",
   "hire",
-  "reels",
   "shop",
   "privacy-policy",
 ];
@@ -33,41 +32,47 @@ function createSlug(title) {
 }
 
 async function generateSitemap() {
-  const urls = [];
+  try {
+    const urls = [];
 
-  staticPages.forEach((page) => {
-    urls.push(`
+    staticPages.forEach((page) => {
+      urls.push(`
   <url>
     <loc>${SITE_URL}${page ? `/${page}` : ""}</loc>
     <priority>${page === "" ? "1.0" : "0.8"}</priority>
   </url>`);
-  });
+    });
 
-  const articlesSnapshot = await getDocs(collection(db, "articles"));
+    const articlesSnapshot = await getDocs(collection(db, "articles"));
 
-  articlesSnapshot.forEach((doc) => {
-    const article = doc.data();
+    articlesSnapshot.forEach((doc) => {
+      const article = doc.data();
 
-    if (article.title) {
-      const slug = createSlug(article.title);
+      if (article.title) {
+        const slug = createSlug(article.title);
 
-      urls.push(`
+        urls.push(`
   <url>
     <loc>${SITE_URL}/articles/${slug}</loc>
     <priority>0.9</priority>
   </url>`);
-    }
-  });
+      }
+    });
 
-  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+    const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${urls.join("")}
 </urlset>`;
 
-  fs.writeFileSync("public/sitemap.xml", sitemap);
+    fs.writeFileSync("public/sitemap.xml", sitemap);
 
-  console.log("✅ Sitemap generated successfully!");
-  console.log(`✅ Total URLs: ${urls.length}`);
+    console.log("✅ Sitemap generated successfully!");
+    console.log(`✅ Total URLs: ${urls.length}`);
+  } catch (error) {
+    console.error("❌ Sitemap generation failed:");
+    console.error(error);
+    process.exit(1);
+  }
 }
 
 generateSitemap();
