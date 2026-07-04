@@ -114,17 +114,15 @@ function App() {
         />
 
         <Route
-          path="/articles/:slug"
-          element={
-            <PageLayout>
-              <SEO
-                title="Article | Samir Simkhada"
-                description="Read this AI, science, space, and technology article by Samir Simkhada."
-              />
-              <ArticleDetail />
-            </PageLayout>
-          }
-        />
+  path="/articles/:slug"
+  element={
+    <PageLayout>
+      <ArticleDetail />
+    </PageLayout>
+  }
+/>
+
+
 
         <Route path="/shop" element={<Navigate to="/" replace />} />
 
