@@ -61,14 +61,13 @@ async function generateSitemap() {
 
     articlesSnapshot.forEach((doc) => {
       const article = doc.data();
+      const slug = article.slug || createSlug(article.title);
 
-      if (!article.title) return;
+if (!slug) return;
 
-      const slug = createSlug(article.title);
+addUrl(`/articles/${slug}`, "0.9");
 
-      if (!slug) return;
 
-      addUrl(`/articles/${slug}`, "0.9");
     });
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
