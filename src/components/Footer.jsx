@@ -22,14 +22,18 @@ function Footer() {
           </a>
 
           <div className="footer-links">
-            <h4>Quick Links</h4>
-            <a href="/">Home</a>
-            <a href="/shop">Shop</a>
-            <a href="/articles">Articles</a>
-            <a href="/about">About</a>
-            <a href="/#contact">Contact</a>
-            <a href="/privacy-policy">Privacy Policy</a>
-          </div>
+  <h4>Quick Links</h4>
+  <a href="/">Home</a>
+  <a href="/articles">Articles</a>
+  <a href="/about">About</a>
+  <a href="/#contact">Contact</a>
+  <a href="/privacy-policy">Privacy Policy</a>
+  <a href="/terms-and-conditions">Terms & Conditions</a>
+  <a href="/disclaimer">Disclaimer</a>
+  <a href="/editorial-policy">Editorial Policy</a>
+</div>
+
+
 
           <div className="footer-social-section">
             <h4>Follow Me</h4>

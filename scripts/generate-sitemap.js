@@ -18,7 +18,11 @@ const staticPages = [
   "articles",
   "about",
   "hire",
+  "quiz",
   "privacy-policy",
+  "terms-and-conditions",
+  "disclaimer",
+  "editorial-policy",
 ];
 
 function createSlug(title) {

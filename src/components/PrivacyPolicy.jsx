@@ -13,7 +13,7 @@ function PrivacyPolicy() {
           protecting any information you share while using our website.
         </p>
 
-        <small>Last Updated: June 2026</small>
+        <small>Last Updated: July 2026</small>
       </div>
 
       <div className="privacy-container">
@@ -182,7 +182,7 @@ function PrivacyPolicy() {
           </p>
 
           <p>
-            <strong>Email:</strong> Wrongsamir88@gmail.com
+            <strong>Email:</strong> wrongsamir88@gmail.com
           </p>
         </div>
       </div>

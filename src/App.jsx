@@ -18,6 +18,11 @@ const About = lazy(() => import("./components/About"));
 const Hire = lazy(() => import("./components/Hire"));
 const Admin = lazy(() => import("./components/Admin"));
 const PrivacyPolicy = lazy(() => import("./components/PrivacyPolicy"));
+const TermsAndConditions = lazy(() =>
+  import("./components/TermsAndConditions")
+);
+const Disclaimer = lazy(() => import("./components/Disclaimer"));
+const EditorialPolicy = lazy(() => import("./components/EditorialPolicy"));
 const Quiz = lazy(() => import("./components/Quiz"));
 
 function Loading() {
@@ -123,8 +128,6 @@ function App() {
 
         <Route path="/shop" element={<Navigate to="/" replace />} />
 
-
-
         <Route
           path="/about"
           element={
@@ -178,6 +181,45 @@ function App() {
         />
 
         <Route
+          path="/terms-and-conditions"
+          element={
+            <PageLayout>
+              <SEO
+                title="Terms & Conditions | Samir Simkhada"
+                description="Read the terms and conditions for using samirsimkhada.com.np."
+              />
+              <TermsAndConditions />
+            </PageLayout>
+          }
+        />
+
+        <Route
+          path="/disclaimer"
+          element={
+            <PageLayout>
+              <SEO
+                title="Disclaimer | Samir Simkhada"
+                description="Read the educational content disclaimer for samirsimkhada.com.np."
+              />
+              <Disclaimer />
+            </PageLayout>
+          }
+        />
+
+        <Route
+          path="/editorial-policy"
+          element={
+            <PageLayout>
+              <SEO
+                title="Editorial Policy | Samir Simkhada"
+                description="Learn how content is researched, written, reviewed, and updated on samirsimkhada.com.np."
+              />
+              <EditorialPolicy />
+            </PageLayout>
+          }
+        />
+
+        <Route
           path="/admin"
           element={
             <PageLayout>
@@ -188,24 +230,24 @@ function App() {
         />
 
         <Route path="/articles-page" element={<Navigate to="/articles" replace />} />
-        
+
         <Route
-  path="*"
-  element={
-    <PageLayout>
-      <SEO
-        title="404 - Page Not Found | Samir Simkhada"
-        description="This page does not exist on samirsimkhada.com.np."
-        noIndex={true}
-      />
-      <div style={{ padding: "120px 20px", textAlign: "center" }}>
-        <h1>404 - Page Not Found</h1>
-        <p>The page you are looking for does not exist.</p>
-        <a href="/">Go back home</a>
-      </div>
-    </PageLayout>
-  }
-/>
+          path="*"
+          element={
+            <PageLayout>
+              <SEO
+                title="404 - Page Not Found | Samir Simkhada"
+                description="This page does not exist on samirsimkhada.com.np."
+                noIndex={true}
+              />
+              <div style={{ padding: "120px 20px", textAlign: "center" }}>
+                <h1>404 - Page Not Found</h1>
+                <p>The page you are looking for does not exist.</p>
+                <a href="/">Go back home</a>
+              </div>
+            </PageLayout>
+          }
+        />
       </Routes>
     </Suspense>
   );

@@ -18,7 +18,23 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://samirsimkhada.com.np/quiz</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://samirsimkhada.com.np/privacy-policy</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://samirsimkhada.com.np/terms-and-conditions</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://samirsimkhada.com.np/disclaimer</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://samirsimkhada.com.np/editorial-policy</loc>
     <priority>0.8</priority>
   </url>
   <url>
