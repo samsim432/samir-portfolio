@@ -65,7 +65,7 @@ function About() {
           <picture>
             <source srcSet="/profile.webp" type="image/webp" />
             <img
-              src="/profile.jpg"
+              src="/profile.webp"
               alt="Samir Simkhada"
               className="about-photo"
               width="260"

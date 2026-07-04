@@ -75,7 +75,7 @@ function Home() {
             <picture>
               <source srcSet="/profile.webp" type="image/webp" />
               <img
-                src="/profile.jpg"
+                src="/profile.webp"
                 alt="Samir Simkhada"
                 className="profile-img"
                 width="320"
