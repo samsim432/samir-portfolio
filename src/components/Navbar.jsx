@@ -6,14 +6,13 @@ function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [active, setActive] = useState("home");
 
-  const links = [
-    ["home", "Home", "/#home"],
-    ["articles", "Articles", "/articles"],
-    ["shop", "Shop", "/shop"],
-    ["about", "About", "/about"],
-    ["contact", "Contact", "/#contact"],
-    ["quiz", "Quiz", "/quiz"],
-  ];
+const links = [
+  ["home", "Home", "/#home"],
+  ["articles", "Articles", "/articles"],
+  ["about", "About", "/about"],
+  ["contact", "Contact", "/#contact"],
+  ["quiz", "Quiz", "/quiz"],
+];
 
   useEffect(() => {
     const handleScroll = () => {

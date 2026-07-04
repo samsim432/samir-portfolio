@@ -18,7 +18,6 @@ const staticPages = [
   "articles",
   "about",
   "hire",
-  "shop",
   "privacy-policy",
 ];
 

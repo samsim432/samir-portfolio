@@ -7,7 +7,6 @@ import Footer from "./components/Footer";
 
 import Home from "./components/Home";
 import Articles from "./components/Articles";
-import Shop from "./components/Shop";
 import ContactMe from "./components/ContactMe";
 
 import "./App.css";
@@ -19,7 +18,6 @@ const About = lazy(() => import("./components/About"));
 const Hire = lazy(() => import("./components/Hire"));
 const Admin = lazy(() => import("./components/Admin"));
 const PrivacyPolicy = lazy(() => import("./components/PrivacyPolicy"));
-const ShopPage = lazy(() => import("./components/ShopPage"));
 const Quiz = lazy(() => import("./components/Quiz"));
 
 function Loading() {
@@ -86,7 +84,6 @@ function MainPage() {
       />
       <Home />
       <Articles />
-      <Shop />
       <ContactMe />
     </PageLayout>
   );
@@ -124,18 +121,9 @@ function App() {
           }
         />
 
-        <Route
-          path="/shop"
-          element={
-            <PageLayout>
-              <SEO
-                title="Shop | Samir Simkhada"
-                description="Explore recommended digital products, tools, and resources from Samir Simkhada."
-              />
-              <ShopPage />
-            </PageLayout>
-          }
-        />
+        <Route path="/shop" element={<Navigate to="/" replace />} />
+
+
 
         <Route
           path="/about"
