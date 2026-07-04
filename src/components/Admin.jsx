@@ -22,6 +22,7 @@ const CATEGORY_OPTIONS = [
   "Space",
   "Earth",
   "Physics",
+  "Science",
   "Chemistry",
   "General",
 ];
@@ -32,6 +33,7 @@ const emptyForm = {
   category: "",
   images: [""],
   author: "Samir Simkhada",
+  date: getTodayDate(),
   summary: "",
   takeaways: "",
   content: "",
@@ -329,8 +331,8 @@ const handleLogout = async () => {
       category: form.category.trim(),
       images: cleanImages,
       image: cleanImages[0],
-      author: form.author.trim(),
-      date: editingId ? undefined : getTodayDate(),
+author: "Samir Simkhada",
+date: form.date?.trim() || getTodayDate(),
       summary: form.summary.trim(),
       text: form.summary.trim(),
       takeaways: cleanTakeaways,
@@ -340,10 +342,7 @@ const handleLogout = async () => {
 
     try {
       if (editingId) {
-        const dataToUpdate = { ...articleData };
-        delete dataToUpdate.date;
-
-        await updateDoc(doc(db, "articles", editingId), dataToUpdate);
+await updateDoc(doc(db, "articles", editingId), articleData);
         alert("Article updated successfully!");
       } else {
    await addDoc(collection(db, "articles"), {
@@ -374,8 +373,10 @@ const handleLogout = async () => {
         Array.isArray(article.images) && article.images.length > 0
           ? article.images
           : [article.image || ""],
-      author: article.author || "Samir Simkhada",
-      summary: article.summary || article.text || "",
+          author: "Samir Simkhada",
+date: article.date || getTodayDate(),
+summary: article.summary || article.text || "",
+
       takeaways: Array.isArray(article.takeaways)
         ? article.takeaways.join("\n")
         : "",
