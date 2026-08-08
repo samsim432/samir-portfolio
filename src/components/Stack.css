@@ -1,0 +1,780 @@
+/* =====================================================
+   STACK PAGE
+===================================================== */
+
+.stack-page {
+  min-height: 100vh;
+  color: #0f172a;
+
+  background:
+    radial-gradient(
+      circle at 8% 5%,
+      rgba(56, 189, 248, 0.09),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 92% 18%,
+      rgba(14, 165, 233, 0.07),
+      transparent 24%
+    ),
+    #f8fbfd;
+}
+
+.stack-container {
+  width: min(1240px, calc(100% - 36px));
+  margin: 0 auto;
+}
+
+.stack-browser {
+  padding: 46px 0 110px;
+}
+
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+.stack-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 20px;
+
+  margin-bottom: 22px;
+}
+
+.stack-back {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 7px;
+
+  padding: 9px 14px;
+
+  border: 1px solid rgba(14, 165, 233, 0.16);
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.86);
+
+  color: #0284c7;
+
+  text-decoration: none;
+
+  font-size: 13px;
+  font-weight: 800;
+
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.04);
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.stack-back:hover {
+  transform: translateY(-1px);
+
+  border-color: rgba(14, 165, 233, 0.32);
+
+  box-shadow: 0 10px 26px rgba(2, 132, 199, 0.08);
+}
+
+.stack-result-count {
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   CONTROLS
+===================================================== */
+
+.stack-controls {
+  display: grid;
+
+  grid-template-columns: minmax(0, 1fr) 210px;
+
+  gap: 12px;
+
+  margin-bottom: 26px;
+}
+
+.stack-search {
+  position: relative;
+}
+
+.stack-search-icon {
+  position: absolute;
+
+  top: 50%;
+  left: 16px;
+
+  width: 18px;
+  height: 18px;
+
+  transform: translateY(-50%);
+
+  color: #64748b;
+
+  pointer-events: none;
+}
+
+.stack-search input,
+.stack-select-wrap select {
+  width: 100%;
+  height: 50px;
+
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 15px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  color: #0f172a;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+
+  box-shadow: 0 7px 24px rgba(15, 23, 42, 0.04);
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.stack-search input {
+  padding: 0 46px 0 46px;
+}
+
+.stack-search input::placeholder {
+  color: #94a3b8;
+}
+
+.stack-search input:focus,
+.stack-select-wrap select:focus {
+  background: #ffffff;
+
+  border-color: rgba(14, 165, 233, 0.5);
+
+  box-shadow:
+    0 0 0 4px rgba(14, 165, 233, 0.07),
+    0 8px 25px rgba(15, 23, 42, 0.05);
+}
+
+.stack-search-clear {
+  position: absolute;
+
+  top: 50%;
+  right: 12px;
+
+  width: 28px;
+  height: 28px;
+
+  transform: translateY(-50%);
+
+  border: none;
+  border-radius: 50%;
+
+  background: #f1f5f9;
+
+  color: #64748b;
+
+  cursor: pointer;
+
+  font-size: 18px;
+  line-height: 1;
+}
+
+.stack-select-wrap select {
+  padding: 0 38px 0 14px;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   GRID
+===================================================== */
+
+.developer-stack-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+
+  gap: 15px;
+}
+
+
+/* =====================================================
+   CARD
+===================================================== */
+
+.developer-stack-card {
+  position: relative;
+
+  min-width: 0;
+  min-height: 280px;
+
+  padding: 18px;
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  border-radius: 21px;
+
+  background: rgba(255, 255, 255, 0.9);
+
+  color: inherit;
+
+  text-decoration: none;
+
+  box-shadow:
+    0 10px 32px rgba(15, 23, 42, 0.045);
+
+  isolation: isolate;
+
+  transition:
+    transform 0.26s ease,
+    border-color 0.26s ease,
+    box-shadow 0.26s ease;
+}
+
+.developer-stack-card::before {
+  content: "";
+
+  position: absolute;
+
+  z-index: -1;
+
+  width: 125px;
+  height: 125px;
+
+  top: -72px;
+  right: -55px;
+
+  border-radius: 50%;
+
+  background: rgba(56, 189, 248, 0.1);
+
+  transition: transform 0.35s ease;
+}
+
+.developer-stack-card:hover {
+  transform: translateY(-5px);
+
+  border-color: rgba(14, 165, 233, 0.3);
+
+  box-shadow:
+    0 18px 44px rgba(2, 132, 199, 0.1);
+}
+
+.developer-stack-card:hover::before {
+  transform: scale(1.3);
+}
+
+
+/* =====================================================
+   CARD HEADER
+===================================================== */
+
+.developer-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+}
+
+.developer-stack-icon {
+  width: 44px;
+  height: 44px;
+
+  display: grid;
+  place-items: center;
+
+  flex-shrink: 0;
+
+  border: 1px solid rgba(14, 165, 233, 0.14);
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eaf8ff,
+      #f8fcff
+    );
+
+  font-size: 20px;
+
+  box-shadow:
+    0 6px 18px rgba(2, 132, 199, 0.07);
+}
+
+.developer-stack-arrow {
+  width: 29px;
+  height: 29px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 50%;
+
+  background: rgba(248, 250, 252, 0.85);
+
+  color: #94a3b8;
+
+  font-size: 13px;
+
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.developer-stack-card:hover .developer-stack-arrow {
+  color: #ffffff;
+
+  background: #0284c7;
+
+  transform: translate(1px, -1px);
+}
+
+
+/* =====================================================
+   CARD CONTENT
+===================================================== */
+
+.developer-stack-category {
+  margin-top: 17px;
+
+  color: #0284c7;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.09em;
+}
+
+.developer-stack-card h2 {
+  margin: 7px 0 0;
+
+  color: #0f172a;
+
+  font-size: 19px;
+  font-weight: 900;
+
+  line-height: 1.14;
+
+  letter-spacing: -0.035em;
+
+  transition: color 0.2s ease;
+}
+
+.developer-stack-card:hover h2 {
+  color: #0284c7;
+}
+
+.developer-stack-description {
+  margin: 10px 0 0;
+
+  color: #64748b;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  line-height: 1.55;
+
+  display: -webkit-box;
+
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   TECHNOLOGIES
+===================================================== */
+
+.stack-tech-list {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap: 5px;
+
+  margin-top: 13px;
+}
+
+.stack-tech-list span {
+  max-width: 100%;
+
+  padding: 5px 8px;
+
+  overflow: hidden;
+
+  border: 1px solid rgba(14, 165, 233, 0.11);
+  border-radius: 999px;
+
+  background: #f0f9ff;
+
+  color: #0369a1;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+.developer-card-footer {
+  margin-top: auto;
+
+  padding-top: 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  border-top:
+    1px solid rgba(148, 163, 184, 0.13);
+}
+
+.developer-card-footer > span {
+  color: #64748b;
+
+  font-size: 10px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+.developer-card-footer strong {
+  display: inline-flex;
+  align-items: center;
+
+  gap: 4px;
+
+  color: #0284c7;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  white-space: nowrap;
+}
+
+.developer-card-footer strong span {
+  transition: transform 0.2s ease;
+}
+
+.developer-stack-card:hover
+.developer-card-footer strong span {
+  transform: translateX(3px);
+}
+
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.stack-empty {
+  padding: 90px 20px;
+
+  text-align: center;
+
+  border:
+    1px dashed rgba(148, 163, 184, 0.35);
+
+  border-radius: 22px;
+
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.stack-empty-icon {
+  width: 50px;
+  height: 50px;
+
+  margin: 0 auto 16px;
+
+  display: grid;
+  place-items: center;
+
+  border-radius: 15px;
+
+  background: #f0f9ff;
+
+  color: #0284c7;
+
+  font-size: 25px;
+}
+
+.stack-empty h2 {
+  margin: 0;
+
+  font-size: 23px;
+}
+
+.stack-empty p {
+  margin: 8px 0 18px;
+
+  color: #64748b;
+}
+
+.stack-empty button {
+  padding: 10px 16px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #0284c7;
+
+  color: white;
+
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   LARGE TABLET
+===================================================== */
+
+@media (max-width: 1050px) {
+  .developer-stack-grid {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+
+/* =====================================================
+   MOBILE / TABLET
+===================================================== */
+
+@media (max-width: 720px) {
+  .stack-container {
+    width: min(100% - 20px, 1240px);
+  }
+
+  .stack-browser {
+    padding: 27px 0 75px;
+  }
+
+  .stack-topbar {
+    margin-bottom: 14px;
+  }
+
+  .stack-controls {
+    grid-template-columns: 1fr 135px;
+
+    gap: 8px;
+
+    margin-bottom: 15px;
+  }
+
+  .stack-search input,
+  .stack-select-wrap select {
+    height: 44px;
+
+    border-radius: 13px;
+
+    font-size: 11px;
+  }
+
+  .stack-search input {
+    padding-left: 39px;
+  }
+
+  .stack-search-icon {
+    left: 13px;
+
+    width: 16px;
+    height: 16px;
+  }
+
+  .developer-stack-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+  }
+
+  .developer-stack-card {
+    min-height: 222px;
+
+    padding: 13px;
+
+    border-radius: 17px;
+  }
+
+  .developer-stack-icon {
+    width: 37px;
+    height: 37px;
+
+    border-radius: 12px;
+
+    font-size: 17px;
+  }
+
+  .developer-stack-arrow {
+    width: 25px;
+    height: 25px;
+
+    font-size: 11px;
+  }
+
+  .developer-stack-category {
+    margin-top: 12px;
+
+    font-size: 8px;
+  }
+
+  .developer-stack-card h2 {
+    margin-top: 5px;
+
+    font-size: 15px;
+
+    line-height: 1.12;
+  }
+
+  .developer-stack-description {
+    margin-top: 7px;
+
+    font-size: 10px;
+
+    line-height: 1.42;
+
+    -webkit-line-clamp: 2;
+  }
+
+  .stack-tech-list {
+    gap: 4px;
+
+    margin-top: 9px;
+  }
+
+  .stack-tech-list span {
+    padding: 4px 6px;
+
+    font-size: 8px;
+  }
+
+  .developer-card-footer {
+    padding-top: 10px;
+  }
+
+  .developer-card-footer > span,
+  .developer-card-footer strong {
+    font-size: 8px;
+  }
+
+  .stack-result-count {
+    font-size: 10px;
+  }
+
+  .stack-back {
+    padding: 7px 11px;
+
+    font-size: 10px;
+  }
+}
+
+
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
+@media (max-width: 420px) {
+  .stack-container {
+    width: calc(100% - 14px);
+  }
+
+  .stack-controls {
+    grid-template-columns: minmax(0, 1fr) 115px;
+  }
+
+  .developer-stack-grid {
+    gap: 7px;
+  }
+
+  .developer-stack-card {
+    min-height: 210px;
+
+    padding: 11px;
+
+    border-radius: 15px;
+  }
+
+  .developer-stack-card h2 {
+    font-size: 14px;
+  }
+
+  .developer-stack-description {
+    font-size: 9px;
+  }
+
+  .developer-card-footer > span {
+    display: none;
+  }
+
+  .developer-card-footer {
+    justify-content: flex-end;
+  }
+}
+
+
+/* =====================================================
+   VERY SMALL MOBILE
+===================================================== */
+
+@media (max-width: 330px) {
+  .developer-stack-card {
+    padding: 9px;
+  }
+
+  .developer-stack-card h2 {
+    font-size: 13px;
+  }
+
+  .stack-tech-list span:nth-child(3) {
+    display: none;
+  }
+}
+
+
+/* =====================================================
+   ACCESSIBILITY
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .developer-stack-card,
+  .developer-stack-card::before,
+  .developer-stack-arrow,
+  .developer-card-footer strong span,
+  .stack-back {
+    transition: none;
+  }
+}
