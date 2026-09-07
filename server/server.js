@@ -6,12 +6,12 @@ import Groq from "groq-sdk";
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 10000;
 
-// Enable CORS cleanly across all origins & preflight requests
+// Enable CORS for all incoming origins and headers
 app.use(
   cors({
-    origin: true, // Automatically reflects request origin
+    origin: true,
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
@@ -24,6 +24,7 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
 });
 
+// Health check endpoint for Render
 app.get("/", (req, res) => {
   res.send("Samir AI Groq backend is running ✅");
 });
@@ -101,6 +102,6 @@ Your rules:
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Samir AI Groq backend running on port ${PORT}`);
 });
