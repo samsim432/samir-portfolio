@@ -8,31 +8,16 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:3000",
-  "https://samirsimkhada.com.np",
-  "https://samir-portfolio-bice.vercel.app",
-];
-
+// Enable CORS cleanly across all origins & preflight requests
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps, curl, or Postman)
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1 || origin.includes("vercel.app")) {
-        return callback(null, true);
-      }
-      return callback(null, true); // Fallback allow all for testing
-    },
+    origin: true, // Automatically reflects request origin
     methods: ["GET", "POST", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-    optionsSuccessStatus: 200,
   })
 );
 
-app.options("*", cors());
 app.use(express.json());
 
 const groq = new Groq({
