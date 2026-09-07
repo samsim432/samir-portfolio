@@ -54,9 +54,9 @@ function SiteBot() {
     setInput("");
     setLoading(true);
 
-    try {
+try {
       const response = await fetch(
-        "https://samir-portfolio-6e1c.onrender.com/api/chat",
+        "https://samir-portfolio-6o1c.onrender.com/api/chat",
         {
           method: "POST",
           headers: {
